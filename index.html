@@ -1,0 +1,2501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>DIMSA Fiscal — Impuesto de Inmueble Panamá</title>
+<style>
+:root{--vd:#1e4d0f;--vm:#2d6b1a;--vv:#4a9c1f;--vc:#e6f4da;--bd:#b8d99a;--or:#c8971e;--oc:#fff8e0;--fo:#f2f5ee;--tx:#111;--ts:#555;--ro:#b52a1a;--na:#d4620a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--fo);color:var(--tx);min-height:100vh;font-size:14px}
+@keyframes progreso{from{width:0}to{width:100%}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* PANTALLAS LOGIN */
+.pant{display:none;min-height:100vh;background:linear-gradient(145deg,#060f03,#122608,#1e4d0f);align-items:center;justify-content:center;padding:20px}
+.pant.vis{display:flex}
+.clogin{background:#fff;border-radius:18px;padding:30px;width:100%;max-width:420px;box-shadow:0 24px 64px rgba(0,0,0,.45)}
+.marca{font-family:'Arial Black',Arial;font-size:42px;color:#4a9c1f;letter-spacing:4px;line-height:1}
+.marca-s{font-size:11px;letter-spacing:3px;color:rgba(255,255,255,.4);font-weight:700;text-transform:uppercase}
+.marca-t{font-size:14px;font-style:italic;color:rgba(255,255,255,.3);font-family:Georgia}
+
+/* CAMPOS */
+.campo{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.campo label{font-size:10px;font-weight:700;color:var(--vd);text-transform:uppercase;letter-spacing:.5px}
+.campo input,.campo select,input.inp,select.sel{padding:10px 12px;border:1.5px solid var(--bd);border-radius:9px;font-size:14px;font-family:inherit;outline:none;width:100%;background:#fff;transition:border-color .15s}
+.campo input:focus,.campo select:focus,input.inp:focus,select.sel:focus{border-color:var(--vv)}
+input[readonly]{background:var(--vc);font-weight:700;color:var(--vd);cursor:default}
+
+/* BOTONES */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border:none;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer;transition:opacity .15s;font-family:inherit}
+.btn:hover{opacity:.88}.btn:active{transform:scale(.97)}
+.bp{background:linear-gradient(135deg,var(--vd),var(--vm));color:#fff;width:100%;padding:13px;font-size:14px;margin-top:4px}
+.bo{background:linear-gradient(135deg,var(--or),#e0b830);color:#fff}
+.bs{background:#fff;color:var(--vd);border:1.5px solid var(--vd)}
+.bg{background:none;border:1.5px solid #ccc;color:#777;width:100%;padding:10px;border-radius:9px;cursor:pointer;font-size:13px;margin-top:8px;font-family:inherit}
+.bg:hover{border-color:#aaa;color:#555}
+.br{background:linear-gradient(135deg,#991a0e,var(--ro));color:#fff}
+
+/* MENSAJES */
+.msg{display:none;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:600;margin-top:10px;text-align:center}
+.me{background:#fde8e6;border:1px solid var(--ro);color:var(--ro)}
+.mk{background:var(--vc);border:1px solid var(--vv);color:var(--vd)}
+.ferr{font-size:11px;color:var(--ro);font-weight:600;margin-top:4px;padding:4px 8px;background:#fde8e6;border-radius:6px;border-left:3px solid var(--ro)}
+.inp-ok{border-color:var(--vv)!important}
+.inp-err{border-color:var(--ro)!important}
+
+/* APP */
+#app{display:none;min-height:100vh;flex-direction:column}
+#app.vis{display:flex}
+header{background:linear-gradient(135deg,#060f03,var(--vd),var(--vm));padding:0 18px;height:60px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 12px rgba(0,0,0,.3);flex-shrink:0}
+.hm{flex:1}.hm .logo{font-family:'Arial Black',Arial;font-size:18px;color:#4a9c1f;letter-spacing:2px}
+.hm .sub{font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.35);text-transform:uppercase}
+.bm{display:inline-block;padding:2px 9px;border-radius:10px;font-size:9px;font-weight:700;margin-left:6px;vertical-align:middle}
+.bml{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45)}
+.bmp{background:rgba(200,151,30,.2);border:1px solid rgba(200,151,30,.4);color:#e0c040}
+.bma{background:rgba(181,42,26,.2);border:1px solid rgba(181,42,26,.4);color:#ff7070}
+.hu{text-align:right;font-size:10px}
+.hu .nom{color:#8edb50;font-weight:700}
+.hu .cu{color:rgba(255,255,255,.35)}
+.bsal{background:rgba(74,156,31,.12);border:1px solid rgba(74,156,31,.25);border-radius:7px;color:rgba(255,255,255,.55);font-size:10px;font-weight:700;padding:4px 10px;cursor:pointer;margin-top:3px;display:block;font-family:inherit}
+.bsal:hover{background:rgba(74,156,31,.2);color:rgba(255,255,255,.8)}
+
+/* TABS */
+nav.tabs{display:flex;background:#080f05;border-bottom:2px solid rgba(74,156,31,.2);flex-shrink:0}
+.tab{flex:1;padding:11px 8px;cursor:pointer;font-size:11px;font-weight:700;color:rgba(255,255,255,.3);text-align:center;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .15s,background .15s;user-select:none}
+.tab:hover{color:rgba(255,255,255,.6);background:rgba(255,255,255,.03)}
+.tab.ac{color:#8edb50;border-bottom-color:var(--vv);background:rgba(74,156,31,.06)}
+.tab.bl{opacity:.3;cursor:not-allowed}
+.tab.do{color:rgba(200,151,30,.7);background:rgba(200,151,30,.05)}
+.tab.do.ac{color:#e0c040;border-bottom-color:var(--or)}
+
+/* PANELES */
+.cont{flex:1;overflow-y:auto}
+.panel{display:none;max-width:960px;margin:0 auto;padding:18px 14px 40px;animation:fadeIn .2s ease}
+.panel.ac{display:block}
+
+/* TARJETAS */
+.tar{background:#fff;border-radius:14px;border:1px solid var(--bd);box-shadow:0 6px 28px rgba(30,77,15,.1);padding:18px;margin-bottom:14px}
+.tar h3{font-size:12px;font-weight:700;color:var(--vd);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--vc)}
+.tar h4{font-size:13px;font-weight:700;margin-bottom:8px}
+.tar label{font-size:10px;font-weight:700;color:var(--vd);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:3px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* BLOQUES RESULTADO */
+.blq{border-radius:11px;padding:14px 16px;margin-bottom:12px;border-left:5px solid}
+.bv{background:var(--vc);border-color:var(--vv)}.bn{background:#fdf3e0;border-color:var(--na)}.br2{background:#fde8e6;border-color:var(--ro)}
+
+/* TABLA */
+.tw{overflow-x:auto;border-radius:10px;border:1px solid var(--bd)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:linear-gradient(135deg,var(--vd),var(--vm));color:#fff;padding:7px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px}
+td{padding:6px 10px;border-bottom:1px solid #f0f0f0}
+tr.xe td{background:#edfada!important;color:var(--vd)}
+tr.xp td{background:#fffbf0!important}
+tr.xt td{background:linear-gradient(135deg,var(--vd),var(--vm))!important;color:#fff!important;font-weight:700}
+
+/* RECOMENDACION */
+.rec{border-radius:14px;padding:16px;background:linear-gradient(135deg,#060f03,var(--vd));color:#fff;margin-top:12px}
+.rec h4{color:#8edb50;font-size:12px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+
+/* CHAT */
+.chat-c{border-radius:14px;overflow:hidden;border:1px solid var(--bd)}
+.chat-h{background:linear-gradient(135deg,#060f03,var(--vd));padding:12px 16px;display:flex;align-items:center;gap:10px}
+.chat-av{width:36px;height:36px;background:rgba(74,156,31,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.chat-nm{font-weight:700;color:#fff;font-size:12px}
+.chat-st{font-size:10px;color:#8edb50}
+#chat-msgs{height:360px;overflow-y:auto;background:#f6fcf2;padding:14px;display:flex;flex-direction:column;gap:10px}
+.chat-pie{background:#fff;padding:10px;border-top:1px solid var(--bd);display:flex;gap:8px}
+#chat-inp{flex:1;border-radius:9px;padding:10px 12px;border:1.5px solid var(--bd);font-family:inherit;font-size:13px;outline:none}
+#chat-inp:focus{border-color:var(--vv)}
+.bbl{display:flex;gap:8px;max-width:88%}
+.bbl.u{align-self:flex-end;flex-direction:row-reverse}
+.bbl-ic{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.bbl-ic.b{background:var(--vc)}.bbl-ic.u{background:linear-gradient(135deg,var(--vd),var(--vv))}
+.bbl-tx{padding:10px 13px;font-size:13px;line-height:1.6}
+.bbl-tx.b{background:#fff;border:1px solid var(--bd);border-radius:4px 13px 13px 13px}
+.bbl-tx.u{background:linear-gradient(135deg,var(--vd),var(--vm));color:#fff;border-radius:13px 4px 13px 13px}
+
+/* ADMIN */
+.sec{margin-bottom:16px}
+.sec h4{font-size:12px;font-weight:700;color:var(--vd);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--bd);text-transform:uppercase;letter-spacing:.4px}
+.fur{display:flex;align-items:flex-start;padding:10px;background:#f8fdf5;border:1px solid var(--bd);border-radius:9px;margin-bottom:6px;gap:8px;flex-wrap:wrap}
+.fur .fi{flex:1;min-width:0}
+.fur .fn{font-weight:700;font-size:12px;color:var(--vd)}
+.fur .fd{font-size:10px;color:#777;line-height:1.6;margin-top:1px}
+.fur .fa{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.bmic{padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:10px;font-weight:700;font-family:inherit}
+.bmic:active{transform:scale(.94)}
+
+/* GRAFICOS */
+.fb{display:flex;align-items:center;gap:6px;margin-bottom:2px}
+.fan{font-size:9px;font-weight:700;color:#888;width:30px;text-align:right;flex-shrink:0}
+.bar{height:15px;border-radius:3px;min-width:2px;transition:width .3s}
+.blb{font-size:9px;font-weight:700;color:#555;margin-left:3px}
+
+/* CIFRAS */
+.cg{font-family:'Arial Black',Arial;font-size:26px;color:var(--vd)}
+.cn{font-family:'Arial Black',Arial;font-size:26px;color:var(--na)}
+
+/* UPGRADE */
+.upi{display:flex;gap:10px;padding:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;margin-bottom:6px}
+.upic{font-size:16px;flex-shrink:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:rgba(200,151,30,.12);border-radius:8px}
+
+/* PDF */
+#pdf-cab{display:none}
+@media print{
+  body{background:#fff!important}
+  header,nav.tabs,footer,.btn,.bp,.bs,.bg,.bo,.br,#bpdf,#nota-exon,#panel-chat,#panel-upgrade,#panel-admin{display:none!important}
+  #pdf-cab{display:block!important}
+  #pdf-pie{display:block!important}
+  .panel.ac{padding:0!important}
+  .tar{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid;margin-bottom:8px!important}
+  .blq{padding:8px 12px!important}
+  table{font-size:9px!important}
+  th,td{padding:4px 6px!important}
+  .rec{break-inside:avoid}
+  @page{size:letter;margin:1.5cm}
+}
+footer{background:linear-gradient(135deg,#060f03,var(--vd));color:rgba(255,255,255,.4);text-align:center;padding:12px;font-size:10px;flex-shrink:0}
+@media(max-width:600px){.g2,.g3{grid-template-columns:1fr}.tab{font-size:9px;padding:10px 4px}}
+</style>
+<!-- EmailJS -->
+</head>
+<body>
+
+<!-- SPLASH -->
+<div class="pant vis" id="ps">
+  <div style="text-align:center">
+    <div class="marca-s" style="margin-bottom:4px">Inversiones</div>
+    <div class="marca" style="font-size:58px">DIMSA</div>
+    <div class="marca-t" style="margin-top:10px">"La Llave de tu Felicidad"</div>
+    <div style="width:180px;height:3px;background:rgba(255,255,255,.08);border-radius:2px;margin:32px auto 0;overflow:hidden">
+      <div style="height:100%;background:linear-gradient(90deg,#4a9c1f,#c8971e);animation:progreso 2s ease forwards"></div>
+    </div>
+  </div>
+</div>
+
+<!-- INICIO -->
+<div class="pant" id="pi">
+  <div style="max-width:540px;width:100%;text-align:center">
+    <div class="marca-s" style="margin-bottom:4px">Inversiones</div>
+    <div class="marca">DIMSA</div>
+    <div class="marca-t" style="margin-top:8px">"La Llave de tu Felicidad"</div>
+    <p style="color:rgba(255,255,255,.35);font-size:12px;margin:12px 0 24px">Asesoría Fiscal Inmobiliaria — Panamá</p>
+    <div class="g2" style="gap:14px">
+      <div onclick="irReg('lite')" style="background:#fff;border-radius:16px;padding:24px 16px;cursor:pointer;border:2px solid #ddd;transition:border-color .15s" onmouseover="this.style.borderColor='#4a9c1f'" onmouseout="this.style.borderColor='#ddd'">
+        <div style="font-size:36px;margin-bottom:8px">🆓</div>
+        <h3 style="font-size:14px;color:var(--vd);margin-bottom:4px">Versión Lite</h3>
+        <p style="font-size:11px;color:#888">Calcula tu impuesto. Gratis.</p>
+        <div style="display:inline-block;padding:3px 12px;border-radius:10px;font-size:10px;font-weight:700;margin-top:10px;background:var(--vc);color:var(--vd)">GRATIS</div>
+      </div>
+      <div onclick="irReg('premium')" style="background:linear-gradient(135deg,#fffef8,#fff8e0);border-radius:16px;padding:24px 16px;cursor:pointer;border:2px solid var(--or);transition:opacity .15s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+        <div style="font-size:36px;margin-bottom:8px">⭐</div>
+        <h3 style="font-size:14px;color:#7a5c00;margin-bottom:4px">Versión Premium</h3>
+        <p style="font-size:11px;color:#888">Análisis completo + Asesor IA.</p>
+        <div style="display:inline-block;padding:3px 12px;border-radius:10px;font-size:10px;font-weight:700;margin-top:10px;background:linear-gradient(135deg,var(--or),#e0b830);color:#fff">B/.3.99/AÑO</div>
+      </div>
+    </div>
+    <div style="margin-top:18px">
+      <button onclick="mostrar('pa')" style="background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.3);padding:7px 16px;border-radius:8px;cursor:pointer;font-size:10px;font-family:inherit">🔧 Administrador</button>
+    </div>
+    <div style="margin-top:14px;font-size:10px;color:rgba(255,255,255,.2)">© 2026 Inversiones DIMSA, S.A.</div>
+  </div>
+</div>
+
+<!-- REGISTRO / LOGIN -->
+<div class="pant" id="pr">
+  <div class="clogin">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-family:'Arial Black',Arial;font-size:20px;color:var(--vd)" id="r-tit">Regístrese Gratis</div>
+      <div id="r-badge" style="display:inline-block;padding:3px 12px;border-radius:10px;font-size:10px;font-weight:700;margin-top:6px;background:var(--vc);color:var(--vd)">LITE</div>
+    </div>
+    <div id="f-reg">
+      <!-- Pestañas Nuevo / Ya tengo cuenta -->
+      <div style="display:flex;gap:0;margin-bottom:18px;border-radius:10px;overflow:hidden;border:1.5px solid var(--bd)">
+        <button id="tab-nuevo" onclick="swRegTab('nuevo')"
+          style="flex:1;padding:10px;border:none;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;background:var(--vd);color:#fff;transition:background .15s">
+          Soy nuevo
+        </button>
+        <button id="tab-existe" onclick="swRegTab('existe')"
+          style="flex:1;padding:10px;border:none;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;background:#f5f5f5;color:#888;transition:background .15s">
+          Ya tengo cuenta
+        </button>
+      </div>
+
+      <!-- Sub-formulario: Registro nuevo -->
+      <div id="sf-nuevo">
+        <div class="campo">
+          <label>Nombre completo</label>
+          <input id="r-nom" placeholder="Juan Pérez" oninput="valNom(this)" autocomplete="name">
+          <div id="r-nom-e" class="ferr" style="display:none"></div>
+        </div>
+        <div class="campo">
+          <label>Teléfono</label>
+          <input id="r-tel" placeholder="6612-3456" oninput="valTel(this)" inputmode="tel" autocomplete="tel">
+          <div id="r-tel-e" class="ferr" style="display:none"></div>
+        </div>
+        <div class="campo">
+          <label>Correo electrónico</label>
+          <input id="r-em" type="email" placeholder="correo@ejemplo.com" oninput="valEmail(this,'r-em')" inputmode="email" autocomplete="email">
+          <div id="r-em-e" class="ferr" style="display:none"></div>
+        </div>
+        <button class="btn bp" onclick="hacerReg()">Registrarme</button>
+      </div>
+
+      <!-- Sub-formulario: Ya tengo cuenta Lite -->
+      <div id="sf-existe" style="display:none">
+        <p style="font-size:12px;color:var(--ts);margin-bottom:14px;line-height:1.6">Ingrese su correo para acceder a su cuenta Lite.</p>
+        <div class="campo">
+          <label>Correo electrónico</label>
+          <input id="re-em" type="email" placeholder="correo@ejemplo.com" inputmode="email" autocomplete="email">
+          <div id="re-em-e" class="ferr" style="display:none"></div>
+        </div>
+        <button class="btn bp" onclick="hacerAccesoLite()">Ingresar a mi cuenta</button>
+      </div>
+    </div>
+    <div id="f-log" style="display:none">
+      <div class="campo"><label>Correo</label><input id="l-em" type="email" placeholder="correo@ejemplo.com"></div>
+      <div class="campo"><label>Clave Premium</label><input id="l-cl" type="password" placeholder="Clave de DIMSA"></div>
+      <button class="btn bp" style="background:linear-gradient(135deg,var(--or),#e0b830)" onclick="hacerLogP()">Ingresar Premium</button>
+      <button class="btn bp" style="margin-top:8px" onclick="hacerLogL()">Continuar como Lite</button>
+      <button class="bg" style="border-color:#7c6ee0;color:#7c6ee0" onclick="recClave()">Olvidé mi clave</button>
+      <div style="background:#f8f8f8;border:1.5px solid #e5e5e5;border-radius:10px;padding:12px;margin-top:12px;font-size:11px;color:#777;line-height:1.7">
+        <strong>¿No tiene cuenta?</strong> Regístrese Lite primero, pague B/.3.99 por Yappy al <strong>6613-2826</strong>.
+        <button class="bg" style="margin-top:8px;padding:7px;font-size:11px" onclick="irReg('lite')">Registrarme primero</button>
+      </div>
+    </div>
+    <div id="r-me" class="msg me"></div>
+    <div id="r-mk" class="msg mk"></div>
+    <button class="bg" onclick="mostrar('pi')">← Volver al inicio</button>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div class="pant" id="pa">
+  <div class="clogin">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:48px">🔧</div>
+      <div style="font-family:'Arial Black',Arial;font-size:18px;color:#991a0e">Administración</div>
+    </div>
+    <div class="campo"><label>Correo admin</label><input id="a-em" placeholder="admin@dimsa.com"></div>
+    <div class="campo"><label>Clave</label><input id="a-cl" type="password"></div>
+    <button class="btn bp br" style="width:100%" onclick="hacerLogA()">Ingresar</button>
+    <div id="a-me" class="msg me"></div>
+    <button class="bg" onclick="mostrar('pi')">← Volver</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div id="pdf-cab" style="text-align:center;padding:14px 0;border-bottom:3px solid var(--vd);margin-bottom:12px">
+    <div style="font-family:'Arial Black',Arial;font-size:26px;color:#4a9c1f;letter-spacing:3px">DIMSA</div>
+    <div style="font-size:11px;color:#999;font-style:italic;font-family:Georgia">"La Llave de tu Felicidad"</div>
+    <p style="font-size:10px;color:#aaa;margin-top:2px">Asesoría Fiscal Inmobiliaria — Panamá</p>
+    <div id="pdf-u" style="font-size:11px;color:#555;margin-top:8px;padding-top:6px;border-top:1px solid #ddd"></div>
+  </div>
+  <header>
+    <div class="hm">
+      <div class="logo">DIMSA <span class="bm bml" id="hbm">LITE</span></div>
+      <div class="sub">Impuesto de Inmueble</div>
+    </div>
+    <div class="hu">
+      <div class="nom" id="hnom">—</div>
+      <div class="cu" id="hcu"></div>
+      <button class="bsal" onclick="salir()">Salir ↩</button>
+    </div>
+  </header>
+  <nav class="tabs" id="tabs"></nav>
+  <div class="cont">
+    <!-- CALCULADORA -->
+    <div class="panel ac" id="panel-calc">
+      <div class="tar">
+        <h3>Datos del Inmueble</h3>
+        <div class="g2">
+          <div>
+            <label>Tipo de inmueble</label>
+            <select id="tipo" class="sel" onchange="alTipo()">
+              <option value="casa" id="op-c">Casa / Lote</option>
+              <option value="ph"   id="op-p">Apartamento PH</option>
+              <option value="terreno">Terreno</option>
+              <option value="comercial">Comercial</option>
+            </select>
+          </div>
+          <div id="c-uso" style="display:none">
+            <label>Uso del inmueble</label>
+            <select id="uso" class="sel" onchange="alUso()">
+              <option value="no">Inversión / Alquiler</option>
+              <option value="si">Vivienda Principal</option>
+              <option value="na" id="op-uso-na" style="display:none">No Aplica Patrimonio Familiar</option>
+            </select>
+            <div id="uso-aviso" style="display:none;margin-top:6px;background:#fdf3e0;border:1px solid var(--na);border-left:4px solid var(--na);border-radius:8px;padding:8px 10px;font-size:11px;color:#7a3a00;line-height:1.5">
+              ⚠️ <strong>Patrimonio Familiar no aplica</strong> para inmuebles de inversión o alquiler. Solo está disponible para vivienda principal.
+            </div>
+          </div>
+        </div>
+        <div id="c-perm" style="display:none;margin-top:12px">
+          <div style="background:#f0f7ea;border:1px solid var(--bd);border-radius:10px;padding:12px">
+            <p style="font-size:10px;font-weight:700;color:var(--vd);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Permisos de Construcción</p>
+            <div class="g2" style="gap:10px;margin-bottom:10px">
+              <div>
+                <label>Mes permiso construcción</label>
+                <select id="mes-c" class="sel" onchange="valPermMes()">
+                  <option value="1">Enero</option><option value="2">Febrero</option>
+                  <option value="3">Marzo</option><option value="4">Abril</option>
+                  <option value="5">Mayo</option><option value="6">Junio</option>
+                  <option value="7">Julio</option><option value="8">Agosto</option>
+                  <option value="9">Septiembre</option><option value="10">Octubre</option>
+                  <option value="11">Noviembre</option><option value="12">Diciembre</option>
+                </select>
+              </div>
+              <div>
+                <label>Año permiso construcción</label>
+                <input id="ano-c" type="number" class="inp" placeholder="Ejemplo - 2014" min="1900" max="2026" oninput="limAno(this);valPerms()">
+                <div id="ano-c-e" class="ferr" style="display:none"></div>
+              </div>
+              <div>
+                <label>Mes permiso ocupación</label>
+                <select id="mes-o" class="sel" onchange="valPermMes()">
+                  <option value="1">Enero</option><option value="2">Febrero</option>
+                  <option value="3">Marzo</option><option value="4">Abril</option>
+                  <option value="5">Mayo</option><option value="6">Junio</option>
+                  <option value="7">Julio</option><option value="8">Agosto</option>
+                  <option value="9">Septiembre</option><option value="10">Octubre</option>
+                  <option value="11">Noviembre</option><option value="12">Diciembre</option>
+                </select>
+              </div>
+              <div>
+                <label>Año permiso ocupación</label>
+                <input id="ano-o" type="number" class="inp" placeholder="Ejemplo - 2015" min="1900" max="2026" oninput="limAno(this);valPerms()">
+                <div id="ano-o-e" class="ferr" style="display:none"></div>
+              </div>
+            </div>
+            <div id="perm-msg" class="ferr" style="display:none;margin-top:4px"></div>
+            <div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--bd)">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+                <label style="margin:0;text-transform:none;font-size:11px;color:var(--vd);font-weight:700">Año de inscripción de mejoras</label>
+                <span style="font-size:9px;background:var(--vc);color:var(--vd);padding:2px 7px;border-radius:8px;font-weight:700">OPCIONAL</span>
+              </div>
+              <p style="font-size:10px;color:#777;margin-bottom:8px;line-height:1.5">Si las mejoras se inscribieron en un año diferente al permiso de construcción, indíquelo aquí. Debe ser posterior al año de construcción. Afecta el cálculo del inicio de exoneración.</p>
+              <input id="ano-i" type="number" class="inp" placeholder="Ej: 2016 — dejar vacío si no aplica" min="1900" max="2026" oninput="limAno(this);valPerms()" style="max-width:320px">
+              <div id="ano-i-e" class="ferr" style="display:none"></div>
+            </div>
+          </div>
+        </div>
+        <div id="c-ident" style="display:none;margin-top:12px">
+          <div style="background:#f0f7ea;border:1px solid var(--bd);border-radius:10px;padding:12px">
+            <p style="font-size:10px;font-weight:700;color:var(--vd);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Datos del Inmueble <span style="font-weight:400;color:#999;font-size:9px;text-transform:none">(opcional)</span></p>
+            <div class="g2" style="gap:10px">
+              <div><label>Propietario</label><input id="id-prop" class="inp" placeholder="Nombre del propietario"></div>
+              <div><label>No. Finca</label><input id="id-finca" class="inp" placeholder="Ej: 123456"></div>
+              <div><label>Descripción</label><input id="id-desc" class="inp" placeholder="Ej: Apartamento Piso 3"></div>
+              <div><label>Ubicación</label><input id="id-ubic" class="inp" placeholder="Ej: Punta Pacífica, Panamá"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px;align-items:end">
+          <div>
+            <label>Terreno (B/.)</label>
+            <input id="vt" class="inp" placeholder="Ejemplo - 25,000" oninput="fmtI(this);calcTot();limpiarErrValor('vt')">
+            <div id="err-vt" class="ferr" style="display:none"></div>
+          </div>
+          <div id="c-mej">
+            <label>Mejoras (B/.)</label>
+            <input id="vm" class="inp" placeholder="Ejemplo - 110,000" oninput="fmtI(this);calcTot();limpiarErrValor('vm')">
+            <div id="err-vm" class="ferr" style="display:none"></div>
+          </div>
+          <div><label>Total</label><input id="vtot" class="inp" readonly></div>
+        </div>
+        <div id="nota-exon" style="margin-top:10px;background:var(--oc);border:1px solid #e8cf80;border-left:4px solid var(--or);border-radius:9px;padding:9px 12px;font-size:11px;color:#6b4a00">
+          ℹ️ La exoneración aplica <strong>solo a mejoras</strong>. El terreno siempre paga impuesto.
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+          <button class="btn bp" style="flex:none;width:auto;padding:10px 22px" onclick="calcular()">Calcular</button>
+          <button class="btn bs" onclick="limpiar()">Limpiar</button>
+          <button class="btn bs" id="bpdf" style="display:none" onclick="expPDF()">📄 PDF</button>
+        </div>
+      </div>
+      <div id="res" style="display:none"></div>
+    </div>
+    <!-- CHAT -->
+    <div class="panel" id="panel-chat"></div>
+    <!-- UPGRADE -->
+    <div class="panel" id="panel-upgrade"></div>
+    <!-- ADMIN -->
+    <div class="panel" id="panel-admin"></div>
+  </div>
+  <footer><strong style="color:#8edb50">INVERSIONES DIMSA, S.A.</strong> — Panamá 2026 — "La Llave de tu Felicidad"</footer>
+</div>
+
+<script>
+'use strict';
+/* ============================================================ CONSTANTES */
+var HOY = 2026;
+var MS  = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+var ses = { u: null, m: 'lite' };  // u=usuario, m=modo
+var chatH = [];
+
+var $ = function(id){ return document.getElementById(id); };
+var FM = function(n){ return 'B/. '+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+/* ============================================================ VALIDACIONES EN TIEMPO REAL */
+
+// Email válido: tiene @, dominio con punto, sin espacios
+var VE = function(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e.trim()); };
+
+// Mostrar/ocultar error de campo individual
+function fErr(inputId, errId, msg){
+  var inp=$(inputId), err=$(errId);
+  if(!inp||!err)return;
+  if(msg){
+    err.textContent=msg; err.style.display='block';
+    inp.classList.add('inp-err'); inp.classList.remove('inp-ok');
+  }else{
+    err.style.display='none';
+    inp.classList.remove('inp-err'); inp.classList.add('inp-ok');
+  }
+}
+
+// Validar Nombre: solo letras, tildes, espacios — sin números ni símbolos
+function valNom(el){
+  var v=el.value;
+  // Bloquear números mientras escribe
+  if(/[0-9]/.test(v)){
+    el.value=v.replace(/[0-9]/g,'');
+    fErr('r-nom','r-nom-e','El nombre no puede contener números.');
+    return;
+  }
+  // Solo letras (incluyendo tildes y ñ), espacios y guiones
+  if(v && !/^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s\-']+$/.test(v)){
+    fErr('r-nom','r-nom-e','El nombre solo puede contener letras y espacios.');
+    return;
+  }
+  if(v.trim().length>0 && v.trim().length<3){
+    fErr('r-nom','r-nom-e','El nombre debe tener al menos 3 letras.');
+  }else if(v.trim().length>=3){
+    fErr('r-nom','r-nom-e','');
+  }else{
+    $('r-nom-e').style.display='none'; el.classList.remove('inp-ok','inp-err');
+  }
+}
+
+// Validar Teléfono: solo dígitos y guiones — sin letras
+function valTel(el){
+  var v=el.value;
+  // Bloquear letras mientras escribe
+  if(/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/.test(v)){
+    el.value=v.replace(/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/g,'');
+    fErr('r-tel','r-tel-e','El teléfono no puede contener letras.');
+    return;
+  }
+  // Solo números, guiones, paréntesis, espacios y +
+  if(v && !/^[\d\s\-\(\)\+]+$/.test(v)){
+    fErr('r-tel','r-tel-e','Solo se permiten números, guiones y paréntesis.');
+    return;
+  }
+  var soloDigitos=v.replace(/[^0-9]/g,'');
+  if(soloDigitos.length>0 && soloDigitos.length<7){
+    fErr('r-tel','r-tel-e','El teléfono debe tener al menos 7 dígitos.');
+  }else if(soloDigitos.length>=7){
+    fErr('r-tel','r-tel-e','');
+  }else{
+    $('r-tel-e').style.display='none'; el.classList.remove('inp-ok','inp-err');
+  }
+}
+
+// Validar Email: debe tener @ y dominio con punto
+function valEmail(el, inputId){
+  var v=el.value.trim();
+  var errId=inputId+'-e';
+  if(!v){ $(errId).style.display='none'; el.classList.remove('inp-ok','inp-err'); return; }
+  if(!v.includes('@')){
+    fErr(inputId,errId,'Falta el símbolo @  (ejemplo: nombre@dominio.com)');
+  }else if(v.indexOf('@')===0){
+    fErr(inputId,errId,'Falta el nombre antes del @');
+  }else if(!v.includes('.',v.indexOf('@'))){
+    fErr(inputId,errId,'Falta el dominio (ejemplo: .com, .net, .org)');
+  }else if(!VE(v)){
+    fErr(inputId,errId,'Correo inválido. Formato: nombre@dominio.com');
+  }else{
+    fErr(inputId,errId,'');
+  }
+}
+var FD = function(iso){ if(!iso)return'Sin fecha'; var p=iso.split('-'); return p[2]+'/'+MS[parseInt(p[1])]+'/'+p[0]; };
+var EXP= function(iso){ if(!iso)return false; var p=iso.split('-'); return new Date(+p[0],+p[1]-1,+p[2],23,59,59)<new Date(); };
+var UK = function(e){ return 'u-'+e.toLowerCase().trim().replace(/@/g,'-at-').replace(/\./g,'-dot-'); };
+var CK = function(e){ return 'c-'+e.toLowerCase().trim().replace(/@/g,'-at-').replace(/\./g,'-dot-'); };
+
+/* ============================================================ EMAIL */
+var _EJS = {
+  pub: 'K4OWdj6n5QNQqNF5B',
+  svc: 'service_o6ufkb8',
+  tBienvenida: 'template_k2byqih',
+  tPremium:    'template_keod427'
+};
+var _ejsReady = false;
+function _initEJS(){
+  if(typeof emailjs!=='undefined'&&!_ejsReady){
+    try{ emailjs.init({publicKey:_EJS.pub}); _ejsReady=true; console.log('EmailJS listo'); }catch(e){}
+  }
+}
+var _ejsInterval=setInterval(function(){_initEJS();if(_ejsReady)clearInterval(_ejsInterval);},300);
+
+function envEmail(templateId, params){
+  // Si EmailJS no está listo, reintentar en 1 segundo
+  if(typeof emailjs==='undefined'||!_ejsReady){
+    setTimeout(function(){ envEmail(templateId,params); },1000);
+    return;
+  }
+  try{
+    emailjs.send(_EJS.svc, templateId, params)
+      .then(function(r){ console.log('Email enviado OK', r.status); })
+      .catch(function(err){ console.warn('Email error:', JSON.stringify(err)); });
+  }catch(e){ console.warn('envEmail exception:',e); }
+}
+
+/* ============================================================ STORAGE — Firebase Firestore */
+var _firebaseConfig = {
+  apiKey: "AIzaSyAUHWDql9wiAqVzJrpqKqIJDbElRC-QRlA",
+  authDomain: "dimsa-fiscal.firebaseapp.com",
+  projectId: "dimsa-fiscal",
+  storageBucket: "dimsa-fiscal.firebasestorage.app",
+  messagingSenderId: "755670222139",
+  appId: "1:755670222139:web:844998c0c9925e420ae31e"
+};
+var _db = null;
+try{
+  if(typeof firebase!=='undefined'){
+    if(!firebase.apps.length) firebase.initializeApp(_firebaseConfig);
+    _db = firebase.firestore();
+  }
+}catch(e){ console.warn('Firebase init error:',e); }
+var _mem = {};  // respaldo en memoria
+
+// sg: obtener valor por clave
+async function sg(k,sh){
+  try{
+    if(!_db) return _mem[k]!==undefined?_mem[k]:null;
+    var col=sh?'shared':'data';
+    var doc=await _db.collection(col).doc(k).get();
+    if(doc.exists) return doc.data().v;
+  }catch(e){}
+  return _mem[k]!==undefined?_mem[k]:null;
+}
+// ss: guardar valor por clave
+async function ss(k,v,sh){
+  _mem[k]=v;
+  try{
+    if(!_db) return true;
+    var col=sh?'shared':'data';
+    await _db.collection(col).doc(k).set({v:v,t:Date.now()});
+  }catch(e){}
+  return true;
+}
+// sd: eliminar por clave
+async function sd(k,sh){
+  delete _mem[k];
+  try{
+    if(!_db) return true;
+    var col=sh?'shared':'data';
+    await _db.collection(col).doc(k).delete();
+  }catch(e){}
+  return true;
+}
+// sl: listar claves con prefijo
+async function sl(p,sh){
+  var keys=[];
+  try{
+    if(!_db) throw new Error('no db');
+    var col=sh?'shared':'data';
+    var snap=await _db.collection(col).get();
+    snap.forEach(function(doc){ if(doc.id.indexOf(p)===0) keys.push(doc.id); });
+  }catch(e){}
+  // incluir también los de memoria
+  Object.keys(_mem).forEach(function(k){ if(k.indexOf(p)===0&&keys.indexOf(k)===-1) keys.push(k); });
+  return keys;
+}
+
+async function gU(em){ var d=await sg(UK(em)); return d?JSON.parse(d):null; }
+async function sU(em,d){ return await ss(UK(em),JSON.stringify(d)); }
+async function gC(em){ var v=await sg(CK(em)); return v?(parseInt(v)||0):0; }
+async function sC(em,n){ return await ss(CK(em),String(n)); }
+async function ntf(d){ await ss('ntf-'+Date.now()+'-'+Math.random().toString(36).substr(2,4),JSON.stringify(d),true); }
+
+/* ============================================================ INIT */
+// DOMContentLoaded: arranca inmediatamente sin esperar scripts externos
+document.addEventListener('DOMContentLoaded',function(){
+  setTimeout(function(){ mostrar('pi'); }, 2400);
+});
+// window.load: inicializa Firebase/EmailJS cuando ya cargaron
+window.addEventListener('load',function(){
+  try{
+    if(typeof firebase!=='undefined'&&!_db){
+      if(!firebase.apps.length) firebase.initializeApp(_firebaseConfig);
+      _db=firebase.firestore();
+    }
+  }catch(e){ console.warn('Firebase:',e); }
+  // EmailJS se inicializa via _initEJS() con intervalo
+  _initEJS();
+  // Admin en segundo plano
+  setTimeout(function(){
+    try{ sU('admin@dimsa.com',{nombre:'Admin DIMSA',tel:'6613-2826',email:'admin@dimsa.com',pass:'DIMSA@Master2026',role:'admin',limit:999999}); }catch(e){}
+  },1000);
+});
+
+/* ============================================================ NAVEGACION */
+function mostrar(id){
+  document.querySelectorAll('.pant').forEach(function(p){p.classList.remove('vis');});
+  $('app').classList.remove('vis'); $('app').style.display='none';
+  var el=$(id); if(el&&el.classList.contains('pant')) el.classList.add('vis');
+}
+function smE(id,t){ var el=$(id); if(el){el.textContent=t;el.style.display='block';} }
+function hM(){ ['r-me','r-mk','a-me'].forEach(function(id){ var el=$(id); if(el)el.style.display='none'; }); }
+
+function irReg(m){
+  hM();
+  var isP=m==='premium';
+  $('f-reg').style.display=isP?'none':''; $('f-log').style.display=isP?'':'none';
+  $('r-tit').textContent=isP?'Acceso Premium':'Regístrese Gratis';
+  var b=$('r-badge'); b.textContent=isP?'PREMIUM':'LITE';
+  b.style.background=isP?'linear-gradient(135deg,var(--or),#e0b830)':'var(--vc)';
+  b.style.color=isP?'#fff':'var(--vd)';
+  mostrar('pr');
+}
+
+/* ============================================================ AUTH */
+function swRegTab(cual){
+  var esNuevo=(cual==='nuevo');
+  $('sf-nuevo').style.display=esNuevo?'':'none';
+  $('sf-existe').style.display=esNuevo?'none':'';
+  $('tab-nuevo').style.background=esNuevo?'var(--vd)':'#f5f5f5';
+  $('tab-nuevo').style.color=esNuevo?'#fff':'#888';
+  $('tab-existe').style.background=esNuevo?'#f5f5f5':'var(--vd)';
+  $('tab-existe').style.color=esNuevo?'#888':'#fff';
+  // Limpiar mensajes al cambiar pestaña
+  hM();
+  var reE=$('re-em-e'); if(reE) reE.style.display='none';
+  var reI=$('re-em'); if(reI){reI.value='';reI.style.borderColor='';}
+}
+
+async function hacerAccesoLite(){
+  hM();
+  var eEl=$('re-em'); if(!eEl)return;
+  var e=eEl.value.trim().toLowerCase();
+  var errEl=$('re-em-e');
+  if(!VE(e)){
+    eEl.style.borderColor='var(--ro)';
+    if(errEl){errEl.textContent='Ingrese un correo electrónico válido.';errEl.style.display='block';}
+    return;
+  }
+  eEl.style.borderColor='var(--vv)';
+  if(errEl) errEl.style.display='none';
+  var u=await gU(e);
+  if(!u){
+    eEl.style.borderColor='var(--ro)';
+    if(errEl){errEl.textContent='No encontramos una cuenta con ese correo. Regístrese primero.';errEl.style.display='block';}
+    return;
+  }
+  if(u.role==='premium'&&!EXP(u.vence)){
+    eEl.style.borderColor='var(--ro)';
+    if(errEl){errEl.textContent='Esta cuenta tiene acceso Premium. Use "Ingresar Premium" en la pantalla de inicio.';errEl.style.display='block';}
+    return;
+  }
+  if(u.role==='admin'){
+    eEl.style.borderColor='var(--ro)';
+    if(errEl){errEl.textContent='Esta es una cuenta de administrador.';errEl.style.display='block';}
+    return;
+  }
+  ses.u=u; ses.m='lite';
+  smE('r-mk','¡Bienvenido de nuevo, '+u.nombre.split(' ')[0]+'!');
+  setTimeout(initApp,900);
+}
+
+async function hacerReg(){
+  hM();
+  var n=$('r-nom').value.trim(), t=$('r-tel').value.trim(), e=$('r-em').value.trim().toLowerCase();
+  var ok=true;
+
+  // Validar Nombre
+  if(!n){
+    fErr('r-nom','r-nom-e','El nombre es obligatorio.'); ok=false;
+  }else if(/[0-9]/.test(n)){
+    fErr('r-nom','r-nom-e','El nombre no puede contener números.'); ok=false;
+  }else if(!/^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s\-\']+$/.test(n)){
+    fErr('r-nom','r-nom-e','El nombre solo puede contener letras y espacios.'); ok=false;
+  }else if(n.length<3){
+    fErr('r-nom','r-nom-e','El nombre debe tener al menos 3 letras.'); ok=false;
+  }else{
+    fErr('r-nom','r-nom-e','');
+  }
+
+  // Validar Teléfono
+  var tDigitos=t.replace(/[^0-9]/g,'');
+  if(!t){
+    fErr('r-tel','r-tel-e','El teléfono es obligatorio.'); ok=false;
+  }else if(/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/.test(t)){
+    fErr('r-tel','r-tel-e','El teléfono no puede contener letras.'); ok=false;
+  }else if(!/^[\d\s\-\(\)\+]+$/.test(t)){
+    fErr('r-tel','r-tel-e','Solo se permiten números, guiones y paréntesis.'); ok=false;
+  }else if(tDigitos.length<7){
+    fErr('r-tel','r-tel-e','El teléfono debe tener al menos 7 dígitos.'); ok=false;
+  }else{
+    fErr('r-tel','r-tel-e','');
+  }
+
+  // Validar Correo
+  if(!e){
+    fErr('r-em','r-em-e','El correo es obligatorio.'); ok=false;
+  }else if(!e.includes('@')){
+    fErr('r-em','r-em-e','Falta el símbolo @  (ejemplo: nombre@dominio.com)'); ok=false;
+  }else if(e.indexOf('@')===0){
+    fErr('r-em','r-em-e','Falta el nombre antes del @'); ok=false;
+  }else if(!VE(e)){
+    fErr('r-em','r-em-e','Correo inválido. Formato: nombre@dominio.com'); ok=false;
+  }else{
+    fErr('r-em','r-em-e','');
+  }
+
+  if(!ok){ smE('r-me','Por favor corrija los campos marcados en rojo.'); return; }
+  var ex=await gU(e);
+  if(ex){
+    // El correo ya existe — no revelar que está registrado ni entrar automáticamente
+    // Redirigir silenciosamente al flujo de login para que ingrese con su cuenta
+    smE('r-me','Este correo ya tiene una cuenta registrada. Use la opción "Ya tengo cuenta" para ingresar.');
+    return;
+  }
+  var nu={nombre:n,tel:t,email:e,role:'lite',pass:null,limit:0};
+  await sU(e,nu);
+  try{await ntf({nombre:n,tel:t,email:e,tipo:'registro',leido:false,fecha:new Date().toLocaleString('es-PA')});}catch(x){}
+  ses.u=nu; ses.m='lite';
+  mostrarModalActivacion(n,t,e);
+}
+
+/*
+ * modalWA — muestra un modal de confirmación antes de abrir WhatsApp.
+ * icono: emoji string, titulo: string, subtitulo: string,
+ * cajaColor: color de fondo de la caja informativa,
+ * cajaTexto: HTML explicativo, btnTexto: texto del botón principal,
+ * onConfirmar: función que se ejecuta al confirmar,
+ * btnCancelarTexto: texto del botón secundario (opcional),
+ * onCancelar: función al cancelar (opcional)
+ */
+function modalWA(cfg){
+  var modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;background:rgba(6,15,3,.88);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  var inner=document.createElement('div');
+  inner.style.cssText='background:#fff;border-radius:20px;padding:28px 24px;max-width:380px;width:100%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.5)';
+  var ic=document.createElement('div');
+  ic.style.cssText='font-size:50px;margin-bottom:8px';
+  ic.textContent=cfg.icono||'📲';
+  inner.appendChild(ic);
+  var tit=document.createElement('p');
+  tit.style.cssText="font-family:'Arial Black',Arial;font-size:16px;color:#1e4d0f;margin-bottom:4px";
+  tit.textContent=cfg.titulo||'';
+  inner.appendChild(tit);
+  if(cfg.subtitulo){
+    var sub=document.createElement('p');
+    sub.style.cssText='font-size:13px;color:#555;margin-bottom:16px;line-height:1.5';
+    sub.textContent=cfg.subtitulo;
+    inner.appendChild(sub);
+  }
+  var caja=document.createElement('div');
+  caja.style.cssText='background:'+(cfg.cajaColor||'#f0fce8')+';border:1.5px solid #b8d99a;border-radius:12px;padding:14px 16px;margin-bottom:18px;text-align:left';
+  caja.innerHTML=
+    '<div style="display:flex;align-items:flex-start;gap:10px">'+
+    '<div style="font-size:24px;flex-shrink:0">&#128242;</div>'+
+    '<div><p style="font-size:11px;color:#333;line-height:1.6">'+(cfg.cajaTexto||'')+'</p></div></div>';
+  inner.appendChild(caja);
+  var btnOk=document.createElement('button');
+  btnOk.style.cssText='width:100%;background:linear-gradient(135deg,#1e4d0f,#2d6b1a);color:#fff;border:none;padding:13px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:8px;font-family:inherit';
+  btnOk.innerHTML='&#x2709;&nbsp; '+(cfg.btnTexto||'Confirmar');
+  btnOk.onclick=function(){ document.body.removeChild(modal); if(cfg.onConfirmar) cfg.onConfirmar(); };
+  inner.appendChild(btnOk);
+  var btnCan=document.createElement('button');
+  btnCan.style.cssText='width:100%;background:none;border:1.5px solid #ddd;color:#888;padding:10px;border-radius:10px;font-size:12px;cursor:pointer;font-family:inherit';
+  btnCan.textContent=cfg.btnCancelarTexto||'Cancelar';
+  btnCan.onclick=function(){ document.body.removeChild(modal); if(cfg.onCancelar) cfg.onCancelar(); };
+  inner.appendChild(btnCan);
+  modal.appendChild(inner);
+  document.body.appendChild(modal);
+}
+
+function mostrarModalActivacion(n,t,e){
+  // Enviar correo automáticamente al registrarse — sin opción de omitir
+  envEmail(_EJS.tBienvenida, {'to_email':e, nombre:n});
+  var modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  var inner=document.createElement('div');
+  inner.style.cssText='background:#fff;border-radius:18px;padding:28px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)';
+  inner.innerHTML=
+    '<div style="font-size:52px;margin-bottom:12px">&#x2705;</div>'+
+    '<p style="font-family:Arial Black,Arial;font-size:17px;color:#1e4d0f;margin-bottom:8px">¡Registro exitoso!</p>'+
+    '<p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:20px">Bienvenido, <strong>'+n.split(' ')[0]+'</strong>. Su cuenta fue creada.<br>Le enviamos un correo de confirmación a <strong>'+e+'</strong>.</p>';
+  var btn=document.createElement('button');
+  btn.style.cssText='width:100%;background:linear-gradient(135deg,#1e4d0f,#2d6b1a);color:#fff;border:none;padding:13px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit';
+  btn.textContent='Entrar a la aplicación →';
+  btn.onclick=function(){ document.body.removeChild(modal); setTimeout(function(){ initApp(); },300); };
+  inner.appendChild(btn);
+  modal.appendChild(inner);
+  document.body.appendChild(modal);
+}
+// FIX: no degradar Premium a Lite
+async function hacerLogL(){
+  hM();
+  var e=$('l-em').value.trim().toLowerCase();
+  if(!VE(e)){smE('r-me','Correo inválido.');return;}
+  var u=await gU(e);
+  if(!u){smE('r-me','Correo o datos incorrectos. Verifique e intente de nuevo.');return;}
+  if(u.role==='premium'&&!EXP(u.vence)){smE('r-me','Esta cuenta tiene Premium activo. Use "Ingresar Premium".');return;}
+  if(u.role==='admin'){smE('r-me','Cuenta admin. Use el panel de Administrador.');return;}
+  ses.u=u;ses.m='lite';initApp();
+}
+
+async function hacerLogP(){
+  hM();
+  var e=$('l-em').value.trim().toLowerCase(),c=$('l-cl').value;
+  if(!VE(e)){smE('r-me','Correo inválido.');return;}
+  if(!c){smE('r-me','Ingrese su clave.');return;}
+  var u=await gU(e);
+  if(!u){smE('r-me','Correo o clave incorrectos.');return;}
+  // Verificar clave PRIMERO para no revelar si la cuenta tiene o no Premium
+  if(u.pass!==c){smE('r-me','Clave incorrecta. Verifique e intente de nuevo.');return;}
+  if(u.role!=='admin'&&u.role!=='premium'){smE('r-me','Esta cuenta no tiene acceso Premium activo.');return;}
+  if(u.role==='premium'&&EXP(u.vence)){smE('r-me','Suscripción vencida. Contáctenos al 6613-2826.');return;}
+  ses.u=u;ses.m=u.role==='admin'?'admin':'premium';initApp();
+}
+
+async function recClave(){
+  hM();
+  var e=$('l-em').value.trim().toLowerCase();
+  if(!VE(e)){smE('r-me','Ingrese su correo primero.');return;}
+  var u=await gU(e);
+  if(!u||!u.pass){smE('r-me','No existe cuenta Premium con ese correo.');return;}
+  var t=(u.tel||'').replace(/[^0-9]/g,'');
+  modalWA({
+    icono: '🔑',
+    titulo: 'Recuperación de clave',
+    subtitulo: 'Su clave ha sido encontrada.',
+    cajaColor: '#f0f0ff',
+    cajaTexto: 'DIMSA Fiscal va a enviarle su clave de acceso Premium al correo <strong>'+e+'</strong>.',
+    btnTexto: '✉️ Enviar clave por correo',
+    btnCancelarTexto: 'Cancelar',
+    onConfirmar: async function(){
+      // Calcular consultas restantes reales
+      var usadas=await gC(e)||0;
+      var restantes=Math.max(0,(u.limit||30)-usadas);
+      // Enviar clave por correo electrónico con saldo real
+      envEmail(_EJS.tPremium, {
+        to_email: e,
+        nombre: u.nombre,
+        'correo electrónico': e,
+        clave: u.pass,
+        consultas: restantes+' de '+(u.limit||30),
+        Vence: u.vence?FD(u.vence):'—'
+      });
+      smE('r-mk','Su clave fue enviada a su correo electrónico.');
+    }
+  });
+}
+
+async function hacerLogA(){
+  var el=$('a-me'); if(el)el.style.display='none';
+  var e=$('a-em').value.trim().toLowerCase(),c=$('a-cl').value;
+  if(!e||!c){smE('a-me','Complete ambos campos.');return;}
+  var u=await gU(e);
+  if(!u||u.role!=='admin'){smE('a-me','No es una cuenta de administrador.');return;}
+  if(u.pass!==c){smE('a-me','Clave incorrecta.');return;}
+  ses.u=u;ses.m='admin';initApp();
+}
+
+/* ============================================================ APP INIT */
+function initApp(){
+  document.querySelectorAll('.pant').forEach(function(p){p.classList.remove('vis');});
+  var app=$('app'); if(!app)return; app.style.display='flex'; app.style.flexDirection='column'; app.style.minHeight='100vh';
+  var u=ses.u,m=ses.m||'lite';
+  if($('hnom')) $('hnom').textContent=u?u.nombre.split(' ')[0]:'—';
+  updCuota();
+  var bm=$('hbm');
+  if(bm){ bm.className='bm bm'+m[0]; bm.textContent=m.toUpperCase(); }
+  var esLite=m==='lite';
+  var esPremOAdmin=(m==='premium'||m==='admin');
+  $('op-p').style.display=esPremOAdmin?'':'none';
+  $('op-c').textContent=esPremOAdmin?'Casa / Lote':'Vivienda (Casa o Apto)';
+  // c-uso display es manejado por alTipo() según tipo seleccionado
+  $('bpdf').style.display=esPremOAdmin?'':'none';
+  $('c-ident').style.display=esPremOAdmin?'':'none';
+  // Limpiar historial chat al iniciar sesión
+  chatH=[];
+  // Vaciar panel chat para que se reconstruya al activar
+  $('panel-chat').innerHTML='';
+  mkTabs();
+  actTab('calc');
+  alTipo();
+  limpiar();
+}
+
+async function updCuota(){
+  var u=ses.u,el=$('hcu');
+  if(!u||(ses.m!=='premium'&&ses.m!=='admin')){el.textContent='';return;}
+  if(ses.m==='admin'){el.textContent='Admin';return;}
+  var n=await gC(u.email);
+  el.textContent=u.limit===999999?'':Math.max(0,u.limit-n)+'/'+u.limit+' consultas';
+}
+
+/*
+ * registrarYAvisarConsulta — incrementa el contador y muestra
+ * avisos en los umbrales: 10, 20, 25, y al llegar a las últimas 5/3/2/1.
+ * Si se alcanza el límite, degrada la sesión a Lite.
+ */
+async function registrarYAvisarConsulta(){
+  var u=ses.u; if(!u||ses.m!=='premium')return;
+  var anterior=await gC(u.email);
+  var nuevo=anterior+1;
+  await sC(u.email,nuevo);
+  updCuota();
+  var lim=u.limit||30;
+  var restantes=Math.max(0,lim-nuevo);
+
+  // Si ya agotó las consultas — degradar a Lite
+  if(nuevo>=lim){
+    mostrarModalLimite();
+    return;
+  }
+
+  // Umbrales de advertencia
+  var msg='';
+  if(nuevo===10){
+    msg='Ha utilizado <strong>10 consultas</strong> de su plan Premium. Le quedan <strong>'+(lim-10)+'</strong>.';
+  }else if(nuevo===20){
+    msg='Ha utilizado <strong>20 consultas</strong>. Le quedan <strong>'+(lim-20)+'</strong>. Considere renovar su suscripción.';
+  }else if(restantes===5){
+    msg='⚠️ Le quedan solo <strong>5 consultas</strong> Premium. Renueve su suscripción para continuar disfrutando todos los beneficios.';
+  }else if(restantes===3){
+    msg='⚠️ Le quedan <strong>3 consultas</strong> Premium. ¡Renueve pronto para no perder el acceso!';
+  }else if(restantes===2){
+    msg='⚠️ Le quedan <strong>2 consultas</strong> Premium. Renueve su suscripción ahora.';
+  }else if(restantes===1){
+    msg='🚨 Le queda <strong>1 consulta</strong> Premium. Esta puede ser su última consulta antes de pasar a plan Lite.';
+  }
+
+  if(msg) mostrarAvisoConsulta(msg,restantes);
+}
+
+function mostrarAvisoConsulta(msg,restantes){
+  var urgente=(restantes<=3);
+  var modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  var inner=document.createElement('div');
+  inner.style.cssText='background:#fff;border-radius:18px;padding:24px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)';
+  inner.innerHTML=
+    '<div style="font-size:40px;margin-bottom:8px">'+(urgente?'&#x1F6A8;':'&#x1F4CA;')+'</div>'+
+    '<p style="font-family:Arial Black,Arial;font-size:15px;color:#1e4d0f;margin-bottom:8px">Consultas Premium</p>'+
+    '<p style="font-size:13px;color:#444;line-height:1.6;margin-bottom:16px">'+msg+'</p>'+
+    (urgente?'<p style="font-size:11px;color:#b52a1a;margin-bottom:16px">Para renovar escriba a: <strong>facturas@inversionesdimsa.com</strong></p>':'');
+  var btnOk=document.createElement('button');
+  btnOk.style.cssText='width:100%;background:linear-gradient(135deg,#1e4d0f,#2d6b1a);color:#fff;border:none;padding:12px;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer;margin-bottom:8px;font-family:inherit';
+  btnOk.textContent='Entendido, continuar';
+  btnOk.onclick=function(){document.body.removeChild(modal);};
+  inner.appendChild(btnOk);
+  modal.appendChild(inner);
+  document.body.appendChild(modal);
+}
+
+function mostrarModalLimite(){
+  ses.m='lite';
+  mkTabs(); alTipo();
+  var bm=$('hbm'); bm.className='bm bml'; bm.textContent='LITE';
+  $('bpdf').style.display='none';
+  $('op-p').style.display='none';
+  $('op-c').textContent='Vivienda (Casa o Apto)';
+  var el=$('hcu'); if(el)el.textContent='';
+  var modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  var inner=document.createElement('div');
+  inner.style.cssText='background:#fff;border-radius:18px;padding:24px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)';
+  inner.innerHTML=
+    '<div style="font-size:48px;margin-bottom:10px">&#x1F512;</div>'+
+    '<p style="font-family:Arial Black,Arial;font-size:16px;color:#b52a1a;margin-bottom:8px">Consultas agotadas</p>'+
+    '<p style="font-size:13px;color:#444;line-height:1.6;margin-bottom:12px">Ha utilizado todas sus consultas Premium. Para renovar escriba a: <strong>facturas@inversionesdimsa.com</strong></p>'+
+    '<p style="font-size:12px;color:#777;margin-bottom:18px">Por el momento tendrá acceso al <strong>plan Lite</strong>.</p>';
+  var btnCont=document.createElement('button');
+  btnCont.style.cssText='width:100%;background:none;border:1.5px solid #ddd;color:#888;padding:10px;border-radius:9px;font-size:12px;cursor:pointer;font-family:inherit';
+  btnCont.textContent='Continuar con plan Lite';
+  btnCont.onclick=function(){document.body.removeChild(modal);};
+  inner.appendChild(btnCont);
+  modal.appendChild(inner);
+  document.body.appendChild(modal);
+}
+
+function salir(){
+  if(ses.m==='lite'){
+    ses.u=null;ses.m='lite';chatH=[];
+    $('app').style.display='none';$('res').style.display='none';
+    mostrar('pi'); return;
+  }
+  // confirm() puede ser bloqueado — confirmación inline
+  var conf=document.createElement('div');
+  conf.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  conf.innerHTML='<div style="background:#fff;border-radius:14px;padding:24px;max-width:300px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)">'+
+    '<p style="font-weight:700;font-size:15px;margin-bottom:16px">¿Cerrar sesión?</p>'+
+    '<div style="display:flex;gap:10px;justify-content:center">'+
+    '<button id="sal-si" style="background:#1e4d0f;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:700;cursor:pointer">Salir</button>'+
+    '<button id="sal-no" style="background:#f0f0f0;color:#333;border:none;padding:10px 20px;border-radius:8px;font-weight:700;cursor:pointer">Cancelar</button>'+
+    '</div></div>';
+  document.body.appendChild(conf);
+  conf.querySelector('#sal-no').onclick=function(){document.body.removeChild(conf);};
+  conf.querySelector('#sal-si').onclick=function(){
+    document.body.removeChild(conf);
+    ses.u=null;ses.m='lite';chatH=[];
+    $('app').style.display='none';$('res').style.display='none';
+    mostrar('pi');
+  };
+}
+
+function mostrarBloqueado(){
+  var conf=document.createElement('div');
+  conf.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  var inner=document.createElement('div');
+  inner.style.cssText='background:#fff;border-radius:14px;padding:24px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)';
+  inner.innerHTML=
+    '<div style="font-size:40px;margin-bottom:10px">&#128274;</div>'+
+    '<p style="font-weight:700;font-size:15px;margin-bottom:6px">Exclusivo Premium</p>'+
+    '<p style="font-size:12px;color:#555;margin-bottom:20px">El Asesor Fiscal IA est&#225; disponible solo en la versi&#243;n Premium.</p>';
+  var btnPrem=document.createElement('button');
+  btnPrem.textContent='Ver opciones Premium →';
+  btnPrem.style.cssText='background:linear-gradient(135deg,#c8971e,#e0b830);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:13px';
+  btnPrem.onclick=function(){document.body.removeChild(conf);actTab('upgrade');};
+  var btnCerr=document.createElement('button');
+  btnCerr.textContent='Cerrar';
+  btnCerr.style.cssText='background:none;border:none;color:#aaa;cursor:pointer;margin-top:8px;font-size:12px;display:block;width:100%';
+  btnCerr.onclick=function(){document.body.removeChild(conf);};
+  inner.appendChild(btnPrem);
+  inner.appendChild(document.createElement('br'));
+  inner.appendChild(btnCerr);
+  conf.appendChild(inner);
+  document.body.appendChild(conf);
+}
+
+function expPDF(){
+  var u=ses.u;
+  var res=$('res');
+  if(!res||res.style.display==='none'){
+    alert('Primero realice un cálculo para poder exportar el informe.');
+    return;
+  }
+
+  // ---- Construir HTML del informe ----
+  var ahora=new Date();
+  var fecha=ahora.toLocaleDateString('es-PA',{day:'2-digit',month:'2-digit',year:'numeric'});
+  var hora=ahora.toLocaleTimeString('es-PA',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  var infoUsuario=u?('<strong>Asesor:</strong> '+u.nombre+' | '+u.email+' | '+(u.tel||'')):'Consulta DIMSA Fiscal';
+  // Leer campos identificadores opcionales
+  var iProp=$('id-prop')?$('id-prop').value.trim():'';
+  var iFinca=$('id-finca')?$('id-finca').value.trim():'';
+  var iDesc=$('id-desc')?$('id-desc').value.trim():'';
+  var iUbic=$('id-ubic')?$('id-ubic').value.trim():'';
+  var tieneIdent=iProp||iFinca||iDesc||iUbic;
+
+  // Clonar resultado y limpiar botones
+  var resClone=res.cloneNode(true);
+  resClone.querySelectorAll('button,.btn').forEach(function(el){el.style.display='none';});
+  // Ajustar fondos oscuros para impresión
+  resClone.querySelectorAll('.rec,[style*="#060f03"],[style*="linear-gradient(145deg,#060f0"]').forEach(function(el){
+    el.style.background='#1a4010';el.style.color='#fff';
+  });
+  // Mostrar pie
+  var piePDF=resClone.querySelector('#pdf-pie');
+  if(piePDF) piePDF.style.display='block';
+
+  var css=[
+    'body{font-family:Segoe UI,Arial,sans-serif;font-size:13px;color:#111;margin:0;padding:20px}',
+    'h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#1e4d0f;border-bottom:2px solid #e6f4da;padding-bottom:6px;margin-bottom:12px}',
+    'h4{font-size:13px;font-weight:700;margin-bottom:6px}',
+    '.tar{background:#fff;border:1px solid #b8d99a;border-radius:10px;padding:16px;margin-bottom:14px;break-inside:avoid}',
+    '.blq{border-radius:8px;padding:12px 14px;margin-bottom:10px;border-left:5px solid}',
+    '.bv{background:#e6f4da;border-color:#4a9c1f}',
+    '.bn{background:#fdf3e0;border-color:#d4620a}',
+    '.br2{background:#fde8e6;border-color:#b52a1a}',
+    'table{width:100%;border-collapse:collapse;font-size:11px}',
+    'th{background:#1e4d0f;color:#fff;padding:6px 8px;text-align:left;font-size:10px}',
+    'td{padding:5px 8px;border-bottom:1px solid #eee}',
+    '.xe td{background:#edfada!important}',
+    '.xp td{background:#fffbf0!important}',
+    '.xt td{background:#1e4d0f!important;color:#fff!important;font-weight:700}',
+    '.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}',
+    '.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}',
+    '.rec{background:#1a4010;color:#fff;border-radius:10px;padding:14px}',
+    '.rec h4{color:#8edb50}',
+    '.cg{font-size:24px;font-weight:900;font-family:Arial Black,Arial;color:#1e4d0f}',
+    '.cn{font-size:24px;font-weight:900;font-family:Arial Black,Arial;color:#d4620a}',
+    '.fb{display:flex;align-items:center;gap:4px;margin-bottom:2px}',
+    '.bar{height:13px;border-radius:3px}',
+    '.ferr,.uso-aviso,#bpdf,button{display:none!important}',
+    '#pdf-pie{display:block!important;text-align:center;padding:10px 0;border-top:2px solid #1e4d0f;font-size:9px;color:#888;margin-top:10px}',
+    '@page{size:letter;margin:1.5cm}',
+    '@media print{body{padding:0}}'
+  ].join('\n');
+
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
+    '<title>DIMSA Fiscal — Informe</title>'+
+    '<style>'+css+'</style></head><body>'+
+    // Cabecera principal
+    '<div style="text-align:center;padding:10px 0;border-bottom:3px solid #1e4d0f;margin-bottom:10px">'+
+    '<div style="font-family:Arial Black,Arial;font-size:26px;color:#4a9c1f;letter-spacing:3px">DIMSA</div>'+
+    '<div style="font-size:10px;color:#aaa;font-style:italic">&#34;La Llave de tu Felicidad&#34; &#8212; Asesor&#237;a Fiscal Inmobiliaria</div>'+
+    '<div style="font-size:10px;color:#777;margin-top:4px">Fecha: <strong>'+fecha+'</strong> &nbsp;|&nbsp; Hora: <strong>'+hora+'</strong></div>'+
+    '<div style="font-size:11px;color:#555;margin-top:4px;padding-top:6px;border-top:1px solid #ddd">'+infoUsuario+'</div>'+
+    '</div>'+
+    // Datos del inmueble opcionales
+    (tieneIdent?
+      '<div style="background:#f0f7ea;border:1px solid #b8d99a;border-radius:8px;padding:12px 14px;margin-bottom:12px;font-size:12px">'+
+      '<p style="font-size:10px;font-weight:700;color:#1e4d0f;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Datos del Inmueble</p>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;line-height:1.9">'+
+      (iProp?'<div><span style="color:#555">Propietario:</span> <strong>'+iProp+'</strong></div>':'')+
+      (iFinca?'<div><span style="color:#555">No. Finca:</span> <strong>'+iFinca+'</strong></div>':'')+
+      (iDesc?'<div><span style="color:#555">Descripci&#243;n:</span> <strong>'+iDesc+'</strong></div>':'')+
+      (iUbic?'<div><span style="color:#555">Ubicaci&#243;n:</span> <strong>'+iUbic+'</strong></div>':'')+
+      '</div></div>'
+    :'')+
+    resClone.innerHTML+
+    '</body></html>';
+
+  // Generar archivo HTML descargable — funciona sin ventanas emergentes
+  try{
+    var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    var fname='DIMSA-Fiscal-'+new Date().toLocaleDateString('es-PA').replace(/\//g,'-')+'.html';
+    a.href=url;
+    a.download=fname;
+    a.style.display='none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+  }catch(err){
+    alert('No se pudo generar el informe: '+err.message);
+  }
+}
+
+/* ============================================================ TABS */
+function mkTabs(){
+  var el=$('tabs'); if(!el)return;
+  var m=ses.m,h='';
+  h+='<div class="tab ac" data-tab="calc" onclick="actTab(\'calc\')">Calculadora</div>';
+  if(m==='lite'){
+    h+='<div class="tab bl" onclick="mostrarBloqueado()" title="Solo Premium">Asesor IA 🔒</div>';
+    h+='<div class="tab do" data-tab="upgrade" onclick="actTab(\'upgrade\')">Ser Premium ⭐</div>';
+  }else{
+    h+='<div class="tab" data-tab="chat" onclick="actTab(\'chat\')">Asesor IA 🏠</div>';
+    if(m==='admin') h+='<div class="tab" data-tab="admin" onclick="actTab(\'admin\')">Admin 🔧</div>';
+  }
+  el.innerHTML=h;
+}
+
+function actTab(cual){
+  var tabs=$('tabs'); if(!tabs)return;
+  tabs.querySelectorAll('[data-tab]').forEach(function(t){t.classList.remove('ac');});
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('ac');});
+  var t=tabs.querySelector('[data-tab="'+cual+'"]'); if(t)t.classList.add('ac');
+  var p=$('panel-'+cual); if(!p)return;
+  p.classList.add('ac');
+  if(cual==='chat')    mkChat();
+  if(cual==='upgrade') mkUpgrade();
+  if(cual==='admin')   mkAdmin();
+}
+
+/* ============================================================ TIPO INMUEBLE */
+function alTipo(){
+  var tp=$('tipo').value;
+  var esT=tp==='terreno', esC=tp==='comercial', esTerOCom=(esT||esC);
+  var _pOa=(ses.m==='premium'||ses.m==='admin');
+
+  // Mejoras y nota exoneración
+  $('c-mej').style.display=esT?'none':'';
+  $('nota-exon').style.display=esT?'none':'';
+  if(esT){$('vm').value='';calcTot();}
+
+  // Campos de permisos (solo premium/admin y no terreno — comercial SÍ necesita fechas)
+  $('c-perm').style.display=(_pOa&&!esT)?'':'none';
+
+  // Campo "Uso del inmueble"
+  var cUso=$('c-uso'), selUso=$('uso');
+  var opNa=$('op-uso-na');
+  if(!cUso||!selUso)return;
+
+  if(esTerOCom){
+    // Terreno o Comercial: mostrar "No Aplica" bloqueado
+    cUso.style.display=_pOa?'':'none';
+    if(opNa)opNa.style.display='';
+    selUso.value='na';
+    selUso.disabled=true;
+    selUso.style.background='#f5f5f5';
+    selUso.style.color='#999';
+    var av=$('uso-aviso'); if(av)av.style.display='none';
+  }else{
+    // Casa o PH: mostrar opciones normales (siempre visible para premium/admin)
+    cUso.style.display=_pOa?'':'none';
+    if(opNa)opNa.style.display='none';
+    selUso.disabled=false;
+    selUso.style.background='';
+    selUso.style.color='';
+    // Solo resetear si venía de terreno/comercial (valor 'na')
+    // NO tocar si ya era 'si' o 'no' — preservar la selección del usuario
+    if(selUso.value==='na') selUso.value='no';
+    alUso(); // actualizar aviso según valor actual
+  }
+}
+
+function alUso(){
+  var tp=$('tipo').value, uso=$('uso').value;
+  var av=$('uso-aviso');
+  if(!av)return;
+  // Mostrar aviso solo si es casa/PH con inversión/alquiler
+  var esResid=tp==='casa'||tp==='ph';
+  av.style.display=(esResid&&uso==='no')?'':'none';
+}
+
+function limAno(el){
+  // Solo permitir dígitos, máximo 4 caracteres
+  var s=el.value.replace(/[^0-9]/g,'');
+  if(s.length>4) s=s.slice(0,4);
+  el.value=s;
+  // Detectar si el año tiene 4 dígitos y está fuera de rango
+  if(s.length===4){
+    var n=parseInt(s);
+    if(n<1900){
+      el.style.borderColor='var(--ro)';
+    }else if(n>HOY){
+      el.style.borderColor='var(--ro)';
+      // Mostrar mensaje de error en el div de error del campo si existe
+      var errId=el.id+'-e'; var errEl=$(errId);
+      if(errEl){errEl.textContent='No se permiten años futuros (máximo '+HOY+').';errEl.style.display='block';}
+    }else{
+      el.style.borderColor='var(--vv)';
+      var errId=el.id+'-e'; var errEl=$(errId);
+      if(errEl)errEl.style.display='none';
+    }
+  }else{
+    el.style.borderColor='';
+    var errId=el.id+'-e'; var errEl=$(errId);
+    if(errEl)errEl.style.display='none';
+  }
+}
+
+// Valida las reglas de orden entre los campos de año de permisos
+function valPermMes(){ valPerms(); }
+
+function valPerms(){
+  var elAC=$('ano-c'),elAO=$('ano-o'),elAI=$('ano-i'),elMC=$('mes-c'),elMO=$('mes-o');
+  // Si los campos no existen en el DOM, no hay nada que validar
+  if(!elAC||!elAO) return true;
+  var ac=parseInt(elAC.value)||0;
+  var mc=parseInt(elMC?elMC.value:1)||1;
+  var ao=parseInt(elAO.value)||0;
+  var mo=parseInt(elMO?elMO.value:1)||1;
+  var ai=parseInt(elAI?elAI.value:'');
+  var eC=$('ano-c-e'),eO=$('ano-o-e'),eI=$('ano-i-e'),eM=$('perm-msg');
+  var ok=true;
+
+  // Limpiar errores previos
+  [eC,eO,eI,eM].forEach(function(e){if(e)e.style.display='none';});
+  [elAC,elAO,elAI].forEach(function(e){if(e)e.style.borderColor='';});
+
+  // Validar año construcción
+  if(ac>0){
+    if(ac<1900){
+      if(eC){eC.textContent='El año debe ser 1900 o posterior.';eC.style.display='block';}
+      if(elAC) elAC.style.borderColor='var(--ro)'; ok=false;
+    }else if(ac>HOY){
+      if(eC){eC.textContent='No se permiten años futuros (máximo '+HOY+').';eC.style.display='block';}
+      if(elAC) elAC.style.borderColor='var(--ro)'; ok=false;
+    }else{
+      if(elAC) elAC.style.borderColor='var(--vv)';
+    }
+  }
+
+  // Validar año ocupación
+  if(ao>0){
+    if(ao<1900){
+      if(eO){eO.textContent='El año debe ser 1900 o posterior.';eO.style.display='block';}
+      if(elAO) elAO.style.borderColor='var(--ro)'; ok=false;
+    }else if(ao>HOY){
+      if(eO){eO.textContent='No se permiten años futuros (máximo '+HOY+').';eO.style.display='block';}
+      if(elAO) elAO.style.borderColor='var(--ro)'; ok=false;
+    }else{
+      if(elAO) elAO.style.borderColor='var(--vv)';
+    }
+  }
+
+  // Regla: ocupación debe ser POSTERIOR a construcción
+  if(ac>=1900 && ac<=HOY && ao>=1900 && ao<=HOY){
+    var fcConst=ac+(mc-1)/12;
+    var fcOcup=ao+(mo-1)/12;
+    if(fcOcup<fcConst){
+      if(eM){eM.textContent='⚠️ El permiso de ocupación ('+ao+') debe ser posterior al permiso de construcción ('+ac+').';eM.style.display='block';}
+      if(elAO) elAO.style.borderColor='var(--ro)'; ok=false;
+    }else if(fcOcup===fcConst){
+      if(eM){eM.textContent='⚠️ El permiso de ocupación debe ser al menos 1 mes posterior al permiso de construcción.';eM.style.display='block';}
+      if(elAO) elAO.style.borderColor='var(--ro)'; ok=false;
+    }
+  }
+
+  // Validar año de inscripción de mejoras (opcional)
+  if(!isNaN(ai) && $('ano-i').value.trim()!==''){
+    if(ai<1900){
+      if(eI){eI.textContent='El año debe ser 1900 o posterior.';eI.style.display='block';}
+      $('ano-i').style.borderColor='var(--ro)'; ok=false;
+    }else if(ai>HOY){
+      if(eI){eI.textContent='No se permiten años futuros (máximo '+HOY+').';eI.style.display='block';}
+      $('ano-i').style.borderColor='var(--ro)'; ok=false;
+    }else if(ac>=1900 && ai<=ac){
+      if(eI){eI.textContent='El año de inscripción de mejoras ('+ai+') debe ser posterior al año de construcción ('+ac+').';eI.style.display='block';}
+      $('ano-i').style.borderColor='var(--ro)'; ok=false;
+    }else{
+      $('ano-i').style.borderColor='var(--vv)';
+    }
+  }
+
+  return ok;
+}
+
+function limpiarErrValor(id){
+  var el=$(id); if(el) el.style.borderColor='var(--vv)';
+  var err=$('err-'+id); if(err) err.style.display='none';
+}
+
+function fmtI(el){
+  var r=el.value.replace(/[^0-9.]/g,''),p=r.split('.');
+  if(p.length>2)r=p[0]+'.'+p.slice(1).join('');
+  p=r.split('.');
+  el.value=(p[0]?parseInt(p[0]).toLocaleString('en-US'):'')+(p[1]!==undefined?'.'+p[1]:'');
+}
+function rV(id){ return parseFloat(($(id).value||'').replace(/,/g,''))||0; }
+
+function calcTot(){
+  var t=rV('vt'),m=rV('vm'),tot=t+m;
+  $('vtot').value=tot>0?tot.toLocaleString('en-US',{minimumFractionDigits:2}):'';
+}
+
+function limpiar(){
+  ['vt','vm','ano-c','ano-o','ano-i'].forEach(function(id){var el=$(id);if(el)el.value='';})
+  // No limpiar los campos identificadores (propietario, finca, etc.) al limpiar cálculo;
+  ['ano-c-e','ano-o-e','ano-i-e','perm-msg'].forEach(function(id){var el=$(id);if(el)el.style.display='none';});
+  ['ano-c','ano-o','ano-i'].forEach(function(id){var el=$(id);if(el)el.style.borderColor='';});
+  $('vtot').value='';$('res').style.display='none';
+}
+
+/* ============================================================ LEYES FISCALES */
+function iTG(b){ if(b<=30000)return 0; if(b<=250000)return(b-30000)*.006; if(b<=500000)return 1320+(b-250000)*.008; return 3320+(b-500000)*.01; }
+function iPF(b){ if(b<=120000)return 0; if(b<=700000)return(b-120000)*.005; return 2900+(b-700000)*.007; }
+
+/*
+ * aniosExo — determina los años de exoneración según la ley vigente
+ *
+ * La ley aplicable se determina por la fecha en que se registra formalmente
+ * la exoneración en la DGI, con esta prioridad:
+ *   1. Inscripción de mejoras (ai) si fue informada
+ *   2. Permiso de ocupación (ao, mo)
+ *   3. Permiso de construcción (ac, mc) como respaldo
+ *
+ * El permiso de construcción establece ELEGIBILIDAD pero no determina la ley.
+ */
+function aniosExo(mc,ac,mo,ao,ai,mj,tp){
+  if(tp==='terreno')return 0;
+  if(!ac||ac<1900||ac>2026)return 0;
+
+  // ---- LOCAL COMERCIAL ----
+  // La ley se determina por el PERMISO DE CONSTRUCCIÓN (no por ocupación/inscripción)
+  if(tp==='comercial'){
+    var fc=ac+(mc-1)/12;
+    if(fc<2004)    return 20;               // Ley 61/2002: antes 01/01/2004 → 20 años
+    if(fc<2005.67) return mj<=100000?10:5;  // Ley 61/2002: 01/01/2004–31/08/2005 (por monto)
+    if(fc<2006.67) return 10;               // Ley 50/2004: 01/09/2005–31/08/2006 → 10 años
+    if(fc<2009.5)  return 20;              // Ley 21/2008: 01/09/2006–30/06/2009 → 20 años
+    if(fc<2012)    return 10;              // Ley 21/2008: 01/07/2009–31/12/2011 → 10 años
+    return 10;                              // Ley 28/2012: desde 01/01/2012 → 10 años
+  }
+
+  // ---- RESIDENCIAL (casa / PH) ----
+  // La ley se determina por: inscripción > ocupación > construcción
+  var r=tp==='casa'||tp==='ph';
+  var fRef;
+  if(ai>0&&ai>=ao){
+    fRef=ai;           // inscripción de mejoras
+  }else if(ao>0&&ao>=1900){
+    fRef=ao+(mo-1)/12; // permiso de ocupación
+  }else{
+    fRef=ac+(mc-1)/12; // respaldo: permiso de construcción
+  }
+
+  if(fRef<2004)    return 20;
+  if(fRef<2005.67) return r?(mj<=100000?15:mj<=250000?10:5):(mj<=100000?10:5);
+  if(fRef<2008.25) return r?(mj<=100000?15:mj<=250000?10:5):10;
+  if(fRef<2009.5)  return 20;
+  if(fRef<2012){
+    if(r&&mj<=80000)return 20;
+    return r?(mj<=100000?15:mj<=250000?10:5):10;
+  }
+  return r?(mj<=120000?20:mj<=300000?10:5):10;
+}
+
+/*
+ * leyExo — devuelve el nombre de la ley que otorga la exoneración
+ * Usa la misma fecha de referencia que aniosExo (inscripción > ocupación > construcción)
+ */
+function leyExo(mc,ac,mo,ao,ai,tp){
+  if(!ac||ac<1900||ac>2026)return 'Año inválido';
+  // Comercial: la ley se determina por el permiso de CONSTRUCCIÓN
+  if(tp==='comercial'){
+    var fc=ac+(mc-1)/12;
+    if(fc<2004)    return 'Ley 61 de 2002 (régimen anterior 2004)';
+    if(fc<2005.67) return 'Ley 61 de 2002';
+    if(fc<2006.67) return 'Ley 50 de 2004';
+    if(fc<2009.5)  return 'Ley 21 de 2008';
+    if(fc<2012)    return 'Ley 21 de 2008';
+    return 'Ley 28 de 2012';
+  }
+  // Residencial: inscripción > ocupación > construcción
+  var fRef;
+  if(ai>0&&ai>=ao){
+    fRef=ai;
+  }else if(ao>0&&ao>=1900){
+    fRef=ao+(mo-1)/12;
+  }else{
+    fRef=ac+(mc-1)/12;
+  }
+  if(fRef<2004)    return 'Régimen anterior a 2004';
+  if(fRef<2005.67) return 'Ley 61 de 2002';
+  if(fRef<2008.25) return 'Ley 50 de 2004';
+  if(fRef<2009.5)  return 'Ley 21 de 2008';
+  if(fRef<2012)    return 'Ley 21 de 2008 y Ley 49 de 2009';
+  return 'Ley 28 de 2012';
+}
+
+// Cálculo del impuesto anual por tipo y estado de exoneración
+function iAnio(yr,aiE,ae,tp,tr,mj){
+  var enE=(ae>0)&&(yr<aiE+ae);
+  if(tp==='terreno') return iTG(tr);
+  // Comercial: durante exoneración mejoras exentas, terreno paga Tabla General
+  if(tp==='comercial') return enE?iTG(tr):iTG(tr+mj);
+  // PH: durante exoneración mejoras exentas, terreno paga 1% (Ley 8/2010)
+  if(tp==='ph') return enE?tr*.01:iTG(tr+mj);
+  // Casa: durante exoneración mejoras exentas, terreno paga Tabla General
+  return enE?iTG(tr):iTG(tr+mj);
+}
+
+function dTG(b){
+  if(b<=0)return 'Sin base imponible.';
+  var l=[],im=0;
+  l.push('Primeros B/.30,000: Exento (0%)');
+  if(b>30000){var t=Math.min(b,250000)-30000,x=t*.006;im+=x;l.push('B/.30,001 a '+FM(Math.min(b,250000))+': '+FM(t)+' × 0.6% = '+FM(x));}
+  if(b>250000){var t=Math.min(b,500000)-250000,x=t*.008;im+=x;l.push('B/.250,001 a '+FM(Math.min(b,500000))+': '+FM(t)+' × 0.8% = '+FM(x));}
+  if(b>500000){var t=b-500000,x=t*.01;im+=x;l.push('Más de B/.500,000: '+FM(t)+' × 1.0% = '+FM(x));}
+  return l.join('<br>')+'<br><strong>Total anual: '+FM(im)+'</strong>';
+}
+function dPF(b){
+  if(b<=0)return 'Sin base imponible.';
+  var l=[],im=0;
+  l.push('Primeros B/.120,000: Exento (0%)');
+  if(b>120000){var t=Math.min(b,700000)-120000,x=t*.005;im+=x;l.push('B/.120,001 a '+FM(Math.min(b,700000))+': '+FM(t)+' × 0.5% = '+FM(x));}
+  if(b>700000){var t=b-700000,x=t*.007;im+=x;l.push('Más de B/.700,000: '+FM(t)+' × 0.7% = '+FM(x));}
+  return l.join('<br>')+'<br><strong>Total anual: '+FM(im)+'</strong>';
+}
+
+/* ============================================================ CALCULAR */
+async function calcular(){
+  var tp=$('tipo').value,tr=rV('vt'),mj=rV('vm'),tot=tr+mj;
+  var esTerreno=tp==='terreno';
+  var esPremAdmin=(ses.m==='premium'||ses.m==='admin');
+  var esResidencial=!esTerreno;  // comercial también necesita fechas de permisos
+  var ok=true;
+  var primerError=null;
+
+  // --- Limpiar todos los errores previos ---
+  ['vt','vm'].forEach(function(id){
+    var el=$(id); if(el) el.style.borderColor='';
+    var err=$('err-'+id); if(err) err.style.display='none';
+  });
+  if(esPremAdmin){
+    ['ano-c','ano-o'].forEach(function(id){
+      var el=$(id); if(el) el.style.borderColor='';
+      var err=$(id+'-e'); if(err) err.style.display='none';
+    });
+    var pm=$('perm-msg'); if(pm) pm.style.display='none';
+  }
+
+  // --- Validar valor del terreno ---
+  if(!tr){
+    var elVt=$('vt'); if(elVt) elVt.style.borderColor='var(--ro)';
+    var errVt=$('err-vt');
+    if(errVt){ errVt.textContent='Debe ingresar el valor del terreno.'; errVt.style.display='block'; }
+    if(!primerError) primerError=$('vt');
+    ok=false;
+  }
+
+  // --- Validar valor de mejoras (obligatorio si no es terreno) ---
+  if(!esTerreno&&!mj){
+    var elVm=$('vm'); if(elVm) elVm.style.borderColor='var(--ro)';
+    var errVm=$('err-vm');
+    if(errVm){ errVm.textContent='Debe ingresar el valor de las mejoras.'; errVm.style.display='block'; }
+    if(!primerError) primerError=$('vm');
+    ok=false;
+  }
+
+  // --- Validar permisos de construcción (solo premium/admin y tipos residenciales) ---
+  if(esPremAdmin&&esResidencial){
+    var ac=parseInt($('ano-c').value)||0;
+    var ao=parseInt($('ano-o').value)||0;
+    var mc=parseInt($('mes-c').value)||1;
+    var mo=parseInt(($('mes-o')&&$('mes-o').value)||1);
+
+    if(!ac||ac<1900||ac>HOY){
+      var el=$('ano-c'); if(el) el.style.borderColor='var(--ro)';
+      var err=$('ano-c-e');
+      if(err){ err.textContent='El año del permiso de construcción es obligatorio (1900–'+HOY+').'; err.style.display='block'; }
+      if(!primerError) primerError=$('ano-c');
+      ok=false;
+    }
+
+    if(!ao||ao<1900||ao>HOY){
+      var el=$('ano-o'); if(el) el.style.borderColor='var(--ro)';
+      var err=$('ano-o-e');
+      if(err){ err.textContent='El año del permiso de ocupación es obligatorio (1900–'+HOY+').'; err.style.display='block'; }
+      if(!primerError) primerError=$('ano-o');
+      ok=false;
+    }
+
+    // Si ambos años están, verificar orden (ocupación posterior a construcción)
+    if(ok&&ac&&ao){
+      var fcC=ac+(mc-1)/12, fcO=ao+(mo-1)/12;
+      if(fcO<=fcC){
+        var pm=$('perm-msg');
+        if(pm){ pm.textContent='⚠️ El permiso de ocupación ('+ao+') debe ser posterior al permiso de construcción ('+ac+').'; pm.style.display='block'; }
+        var el=$('ano-o'); if(el) el.style.borderColor='var(--ro)';
+        if(!primerError) primerError=$('ano-o');
+        ok=false;
+      }
+    }
+  }
+
+  // --- Si hay errores, scroll al primero y detener ---
+  if(!ok){
+    if(primerError) primerError.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+
+  if(ses.m==='lite') rLite(tp,tr,mj,tot);
+  else if(esPremAdmin) await rPrem(tp,tr,mj,tot);
+  $('res').style.display='block';
+  $('res').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* -------- RESULTADO LITE -------- */
+function rLite(tp,tr,mj,tot){
+  var nm=ses.u?ses.u.nombre.split(' ')[0]:'',esR=tp!=='terreno'&&tp!=='comercial';
+  var iSE=iTG(tp==='terreno'?tr:tot),iCE=iTG(tr);
+  var h='<div class="tar"><h3>Resultado'+(nm?' para '+nm:'')+'  — Versión Lite</h3>';
+  if(esR){
+    h+='<div class="blq bn"><h4>⚠️ Cálculo Genérico</h4><p style="font-size:12px;color:var(--ts);margin-top:4px;line-height:1.7">Asume 20 años de exoneración. No distingue PH de Casa. No calcula Patrimonio Familiar.</p></div>';
+    h+='<div class="g2" style="gap:12px;margin-bottom:12px">';
+    h+='<div style="background:var(--vc);border:1.5px solid var(--vv);border-radius:11px;padding:14px"><div style="font-size:10px;font-weight:700;color:var(--vd);text-transform:uppercase;margin-bottom:4px">Durante exoneración (est.)</div><div class="cg">'+FM(iCE)+'</div><div style="font-size:10px;color:#777">/año</div></div>';
+    h+='<div style="background:#fdf3e0;border:1.5px solid var(--na);border-radius:11px;padding:14px"><div style="font-size:10px;font-weight:700;color:var(--na);text-transform:uppercase;margin-bottom:4px">Sin exoneración</div><div class="cn">'+FM(iSE)+'</div><div style="font-size:10px;color:#777">/año</div></div></div>';
+  }else{
+    h+='<div class="blq br2"><h4>Sin Exoneración</h4><p style="margin-top:6px">Impuesto anual: <strong style="font-size:18px">'+FM(iSE)+'</strong></p></div>';
+  }
+  h+='</div>';
+  h+='<div style="background:linear-gradient(145deg,#060f03,#122608,#1e4d0f);border-radius:16px;padding:22px;margin-top:4px;border:2px solid rgba(200,151,30,.3)">';
+  h+='<div style="font-family:\'Arial Black\',Arial;font-size:16px;color:var(--or);text-align:center;margin-bottom:14px">Lo que NO incluye la versión Lite</div>';
+  [['📜','Ley aplicable real'],['📅','Período exacto de exoneración'],['🏠','Diferenciación PH vs Casa'],['⚖️','Cálculo Patrimonio Familiar'],['📊','Gráfico comparativo 20 años'],['🤖','Asesor Fiscal IA'],['📄','Informe PDF']].forEach(function(f){
+    h+='<div class="upi"><div class="upic">'+f[0]+'</div><div style="align-self:center;font-size:12px;color:rgba(255,255,255,.7)">'+f[1]+'</div></div>';
+  });
+  h+='<div style="text-align:center;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">';
+  h+='<div style="font-family:\'Arial Black\',Arial;font-size:32px;color:var(--or)">B/.3.99</div>';
+  h+='<div style="font-size:11px;color:rgba(255,255,255,.35);margin-bottom:10px">por año</div>';
+  h+='<button class="btn bo" style="width:100%;padding:13px;font-size:14px" onclick="actTab(\'upgrade\')">Quiero ser Premium →</button></div></div>';
+  $('res').innerHTML=h;
+}
+
+/* -------- RESULTADO PREMIUM / ADMIN -------- */
+async function rPrem(tp,tr,mj,tot){
+  var nm=ses.u?ses.u.nombre.split(' ')[0]:'';
+  var mc=parseInt($('mes-c').value)||1;
+  var moEl=$('mes-o'); var mo=moEl?parseInt(moEl.value)||1:1;
+  var ac=parseInt($('ano-c').value)||0;
+  var ao=parseInt($('ano-o').value)||0;
+  var aiEl=$('ano-i'); var aiStr=aiEl?aiEl.value.trim():'';
+  var ai=aiStr!==''?parseInt(aiStr)||0:0;  // 0 = no informado (opcional)
+  var _usoEl=$('uso'); var uso=(_usoEl&&_usoEl.value&&_usoEl.value!=='na'&&_usoEl.value!=='')?_usoEl.value:'no';
+  var esR=tp!=='terreno'&&tp!=='comercial';
+  // Patrimonio Familiar solo aplica a vivienda PRINCIPAL (casa o PH con uso==='si')
+  // esPF: true solo si el tipo es residencial Y el uso es vivienda principal
+  var esPF=((tp==='casa'||tp==='ph')&&(uso==='si'));
+
+  if(esR){
+    // Usar valPerms() para validar y mostrar mensajes en los campos
+    if(!valPerms()){
+      // Hacer scroll al primer error
+      var primErr=document.querySelector('#c-perm .ferr[style*="block"]');
+      if(primErr) primErr.scrollIntoView({behavior:'smooth',block:'center'});
+      return;
+    }
+    // Validaciones de presencia
+    if(!ac||ac<1900||ac>HOY){
+      var eC=$('ano-c-e');
+      if(eC){eC.textContent='Ingrese el año del permiso de construcción (1900–'+HOY+').';eC.style.display='block';}
+      $('ano-c').style.borderColor='var(--ro)'; return;
+    }
+    if(!ao||ao<1900||ao>HOY){
+      var eO=$('ano-o-e');
+      if(eO){eO.textContent='Ingrese el año del permiso de ocupación (1900–'+HOY+').';eO.style.display='block';}
+      $('ano-o').style.borderColor='var(--ro)'; return;
+    }
+  }
+
+  var esComercial=tp==='comercial';
+
+  // Inicio de exoneración según tipo:
+  // — Residencial: inscripción > ocupación
+  // — Comercial pre-sep2006: solo desde ocupación
+  //   Comercial sep2006+: min(ocupación, inscripción) — lo que ocurra primero
+  // — Terreno: sin exoneración
+  var aiE;
+  if(esR){
+    // El inicio es el que ocurra PRIMERO: ocupación o inscripción de mejoras
+    aiE=(ai>0)?Math.min(ao,ai):(ao||HOY);
+  }else if(esComercial&&ao>0){
+    var fc_c=ac+(mc-1)/12;
+    if(fc_c<2006.67){
+      aiE=ao;  // Ley 61 y 50: corre desde el permiso de ocupación
+    }else{
+      aiE=(ai>0)?Math.min(ao,ai):ao;  // Ley 21+: lo que ocurra primero
+    }
+  }else{
+    aiE=HOY;
+  }
+
+  var ae=aniosExo(mc,ac,mo,ao,ai,mj,tp),afE=aiE+ae,rest=Math.max(0,afE-HOY);
+  var ley=(esR||esComercial)?leyExo(mc,ac,mo,ao,ai,tp):'';
+  // Mes de fin: usa mes de ocupación (mo) ya que es el inicio legal del período
+  var mF=MS[mo]+' de '+afE;
+  // Inicio: si hay inscripción de mejoras posterior a ocupación, se usa ese año; sino, año de ocupación
+  var mI=(esR&&ai>0&&ai>ao)?(MS[mo]+' de '+ao+' (ocup.) / '+ai+' (insc. mejoras)'):(MS[mo]+' de '+aiE);
+  // Nota explicativa: si hay inscripción, explica por qué se usó esa fecha como referencia de la ley
+  // docInicio: explica exactamente cuál documento origina el inicio del período
+  var docInicio='', fechaInicioDisplay='';
+  if(esComercial){
+    var fc_c2=ac+(mc-1)/12;
+    if(fc_c2<2006.67){
+      // Ley 61/2002 y Ley 50/2004: corre desde permiso de ocupación
+      docInicio='Permiso de ocupación';
+      fechaInicioDisplay=MS[mo]+' de '+ao;
+    }else if(ai>0&&ai<ao){
+      // Ley 21/2008+: inscripción ocurrió ANTES que ocupación
+      docInicio='Inscripción de mejoras en Registro Público';
+      fechaInicioDisplay=ai+' (anterior al permiso de ocupación: '+MS[mo]+' de '+ao+')';
+    }else if(ai>0&&ai===ao){
+      docInicio='Inscripción de mejoras / Permiso de ocupación (mismo año)';
+      fechaInicioDisplay=MS[mo]+' de '+ao;
+    }else{
+      // Sin inscripción o ocupación <= inscripción
+      docInicio='Permiso de ocupación';
+      fechaInicioDisplay=MS[mo]+' de '+ao;
+    }
+  }else if(esR&&ai>0&&ai<ao){
+    // Inscripción antes que ocupación → rige inscripción (ocurrió primero)
+    docInicio='Inscripción de mejoras en Registro Público';
+    fechaInicioDisplay=ai+' (anterior al permiso de ocupación: '+MS[mo]+' de '+ao+')';
+  }else if(esR&&ai>0&&ai===ao){
+    // Mismo año
+    docInicio='Permiso de ocupación / Inscripción de mejoras (mismo año)';
+    fechaInicioDisplay=MS[mo]+' de '+ao;
+  }else if(esR&&ai>0&&ai>ao){
+    // Ocupación antes que inscripción → rige ocupación (ocurrió primero)
+    docInicio='Permiso de ocupación';
+    fechaInicioDisplay=MS[mo]+' de '+ao+' (la inscripción de mejoras '+ai+' fue posterior)';
+  }else if(esR){
+    // Sin inscripción informada
+    docInicio='Permiso de ocupación';
+    fechaInicioDisplay=MS[mo]+' de '+ao;
+  }
+
+  var notaInscr='';
+  if(esComercial){
+    notaInscr='📋 Documento que determina la LEY aplicable: Permiso de construcción ('+MS[mc]+' de '+ac+'). '
+      +'Documento que determina el INICIO del período: '+docInicio
+      +(ac+(mc-1)/12>=2006.67?' (Ley 21/2008 en adelante: se toma el que ocurra primero entre ocupación e inscripción).'
+      :'.');
+  }else if(esR&&ai>0&&ai<ao){
+    // Inscripción anterior a ocupación → rige inscripción
+    notaInscr='📋 Inicio del período: Inscripción de mejoras ('+ai+') — ocurrió ANTES del permiso de ocupación ('+MS[mo]+' de '+ao+'). '
+      +'Se toma el que ocurra primero.';
+  }else if(esR&&ai>0&&ai===ao){
+    notaInscr='📋 Inicio del período: Permiso de ocupación / Inscripción de mejoras — coinciden en el mismo año ('+ao+').';
+  }else if(esR&&ai>0&&ai>ao){
+    // Ocupación anterior a inscripción → rige ocupación
+    notaInscr='📋 Inicio del período: Permiso de ocupación ('+MS[mo]+' de '+ao+') — ocurrió ANTES de la inscripción de mejoras ('+ai+'). '
+      +'Se toma el que ocurra primero.';
+  }else if(esR){
+    notaInscr='📋 Inicio del período: Permiso de ocupación ('+MS[mo]+' de '+ao+'). '
+      +'La exoneración comienza a correr desde la fecha de este documento.';
+  }
+  var proy=[],tA=0,tPF=0;
+  for(var y=HOY;y<HOY+20;y++){
+    var ia=iAnio(y,aiE,ae,tp,tr,mj),enE=ae>0&&y<afE,ipf=esPF?iPF(tot):0;
+    tA+=ia;tPF+=ipf;proy.push({y:y,i:ia,e:enE,p:ipf});
+  }
+  var h='';
+
+  /* -- EXONERACIÓN -- */
+  // Debug: mostrar modo de cálculo en título si hay problema de PF
+  h+='<div class="tar"><h3>Régimen de Exoneración'+(nm?' — '+nm:'')+'</h3>';
+  if(tp==='terreno'){
+    h+='<div class="blq br2"><h4>Sin Exoneración</h4><p style="font-size:12px;color:var(--ts);margin-top:4px;line-height:1.7">Los terrenos sin construcción no califican para exoneración.</p>';
+    h+='<div style="background:#f9f9f9;border:1px solid #e0e0e0;border-radius:8px;padding:10px;margin-top:10px"><p style="font-size:11px;line-height:2">'+dTG(tr)+'</p></div></div>';
+  }else if(ae>0){
+    h+='<div class="blq '+(rest>0?'bv':'bn')+'">';
+    h+='<h4>'+(rest>0?'✅ Exoneración Vigente — Quedan <strong>'+rest+' año(s)</strong>':'⏰ Exoneración Vencida')+'</h4>';
+    // Construir detalleExo completo antes de añadir a h (evita duplicado)
+    var detalleExo='<div style="background:rgba(255,255,255,.7);border-radius:10px;padding:12px;margin:10px 0;font-size:12px;line-height:2.2">';
+    detalleExo+='<strong>Ley:</strong> '+ley+'<br>';
+    detalleExo+='<strong>Duración:</strong> '+ae+' años<br>';
+    detalleExo+='<strong>Permiso construcción:</strong> '+MS[mc]+' de '+ac+'<br>';
+    detalleExo+='<strong>Permiso ocupación:</strong> '+MS[mo]+' de '+ao+'<br>';
+    if(ai>0) detalleExo+='<strong>Inscripción mejoras:</strong> '+ai+'<br>';
+    detalleExo+='<strong>Inicio exoneración:</strong> '+(fechaInicioDisplay||MS[mo]+' de '+aiE)+'<br>';
+    if(docInicio) detalleExo+='<strong>Documento base inicio:</strong> <span style="color:#1e4d0f;font-weight:700">'+docInicio+'</span><br>';
+    detalleExo+='<strong>Fin exoneración:</strong> '+mF+'<br>';
+    detalleExo+=rest>0?'<strong>Restantes:</strong> <span style="color:var(--vv);font-weight:900">'+rest+' año(s)</span>':'<strong>Estado:</strong> <span style="color:var(--ro);font-weight:900">Vencida desde '+mF+'</span>';
+    detalleExo+='</div>';
+    h+=detalleExo;
+    if(notaInscr) h+='<div style="background:#fffbf0;border:1px solid var(--or);border-radius:8px;padding:9px 12px;font-size:11px;color:#7a5c00;margin-bottom:10px">'+notaInscr+'</div>';
+    if(rest>0){
+      h+='<div style="background:#fff;border:1.5px solid var(--vv);border-radius:10px;padding:14px;margin-bottom:10px">';
+      h+='<p style="font-size:12px;font-weight:700;color:var(--vd);margin-bottom:8px">DURANTE la exoneración (hasta '+mF+')</p>';
+      if(tp==='comercial'){
+        h+='<p style="font-size:12px;color:var(--ts);margin-bottom:8px">Local comercial en exoneración:<br>• Mejoras: <strong style="color:var(--vd)">completamente exoneradas (B/.0.00)</strong><br>• Terreno: paga Tabla General</p>';
+        h+='<div style="background:#f5fdf0;border:1px solid var(--bd);border-radius:8px;padding:12px;font-size:12px;line-height:2.2">';
+        h+=dTG(tr);
+        h+='<br><span style="color:var(--vv);font-weight:700">Mejoras ('+FM(mj)+'): B/. 0.00 — EXONERADAS</span></div>';
+      }else if(tp==='ph'){
+        h+='<p style="font-size:12px;color:var(--ts);margin-bottom:8px">PH en exoneración (Ley 8/2010):<br>• Mejoras: <strong style="color:var(--vd)">completamente exoneradas (B/.0.00)</strong><br>• Terreno: paga 1%</p>';
+        h+='<div style="background:#f5fdf0;border:1px solid var(--bd);border-radius:8px;padding:12px;font-size:12px;line-height:2.2">Terreno: '+FM(tr)+' × 1% = <strong>'+FM(tr*.01)+' /año</strong><br><span style="color:var(--vv);font-weight:700">Mejoras ('+FM(mj)+'): B/. 0.00 — EXONERADAS</span></div>';
+      }else{
+        h+='<p style="font-size:12px;color:var(--ts);margin-bottom:8px">Mejoras ('+FM(mj)+'): <strong>completamente exoneradas</strong>. Solo el terreno paga.</p>';
+        h+='<div style="background:#f5fdf0;border:1px solid var(--bd);border-radius:8px;padding:12px"><p style="font-size:11px;line-height:2">'+dTG(tr)+'</p></div>';
+      }
+      h+='</div>';
+    }
+    h+='<div style="background:#fdf3e0;border:1.5px solid var(--na);border-radius:10px;padding:14px">';
+    h+='<p style="font-size:12px;font-weight:700;color:var(--na);margin-bottom:8px">SIN exoneración (desde '+mF+')</p>';
+    h+='<p style="font-size:12px;color:var(--ts);margin-bottom:8px">Valor total: '+FM(tot)+'</p>';
+    h+='<div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:12px"><p style="font-size:11px;line-height:2">'+dTG(tot)+'</p></div></div></div>';
+  }else{
+    h+='<div class="blq br2"><h4>Sin Exoneración</h4><p style="font-size:11px;line-height:2">'+dTG(tot)+'</p></div>';
+  }
+  h+='</div>';
+
+  /* -- PATRIMONIO FAMILIAR -- */
+  if(esPF){
+    h+='<div class="tar"><h3>Patrimonio Familiar (Ley 3 de 1985)</h3>';
+    h+='<p style="font-size:12px;color:var(--ts);margin-bottom:12px;line-height:1.7">Régimen especial para vivienda principal. Tarifas reducidas.</p>';
+    h+='<div style="background:#fdf3e0;border:1.5px solid var(--na);border-radius:10px;padding:14px">';
+    h+='<p style="font-size:12px;font-weight:700;color:var(--na);margin-bottom:8px">Valor total: '+FM(tot)+'</p>';
+    h+='<div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:12px"><p style="font-size:11px;line-height:2">'+dPF(tot)+'</p></div></div></div>';
+  }
+
+  /* -- PROYECCIÓN 20 AÑOS -- */
+  h+='<div class="tar"><h3>Proyección 20 Años ('+HOY+' — '+(HOY+19)+')</h3>';
+  if(esPF){
+    h+='<div class="g2" style="gap:12px;margin-bottom:16px">';
+    h+='<div style="background:var(--vc);border:2px solid var(--vv);border-radius:11px;padding:14px"><div style="font-size:9px;font-weight:700;color:var(--vd);text-transform:uppercase;margin-bottom:4px">Régimen Actual (20 años)</div><div class="cg">'+FM(tA)+'</div><small style="color:#777">Promedio: '+FM(tA/20)+'/año</small></div>';
+    h+='<div style="background:#fdf3e0;border:2px solid var(--na);border-radius:11px;padding:14px"><div style="font-size:9px;font-weight:700;color:var(--na);text-transform:uppercase;margin-bottom:4px">Patrimonio Familiar (20 años)</div><div class="cn">'+FM(tPF)+'</div><small style="color:#777">Promedio: '+FM(tPF/20)+'/año</small></div>';
+    h+='</div>';
+  }
+  h+='<div class="tw"><table><thead><tr><th>Año</th><th>Estado</th><th>Régimen Actual</th>';
+  if(esPF)h+='<th style="background:#8b4000">Patrimonio Familiar</th><th style="background:#2a2a2a">Diferencia</th>';
+  h+='</tr></thead><tbody>';
+  var cambio=0;
+  proy.forEach(function(f){
+    var pfM=esPF&&f.p<f.i,df=f.i-f.p;
+    if(pfM&&!cambio)cambio=f.y;
+    h+='<tr class="'+(f.e?'xe':'xp')+'">';
+    h+='<td><strong>'+f.y+'</strong></td>';
+    h+='<td>'+(f.e?'<span style="padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;background:var(--vv);color:#fff">Exonerado</span>':'<span style="padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;background:#e8830a;color:#fff">Paga</span>')+'</td>';
+    h+='<td><strong>'+FM(f.i)+'</strong></td>';
+    if(esPF){h+='<td><strong style="color:var(--na)">'+FM(f.p)+'</strong></td><td style="font-size:10px;font-weight:700;color:'+(df>0?'var(--vd)':'var(--ro)') +'">'+(df>0?'Ahorra '+FM(df)+' con Patrimonio Familiar':'Actual +'+FM(Math.abs(df)))+'</td>';}
+    h+='</tr>';
+  });
+  h+='<tr class="xt"><td colspan="2">TOTAL 20 AÑOS</td><td>'+FM(tA)+'</td>';
+  if(esPF){var dT=tA-tPF;h+='<td>'+FM(tPF)+'</td><td style="color:#fff">'+(dT>0?'Ahorro Patrimonio Familiar: '+FM(dT):'—')+'</td>';}
+  h+='</tr></tbody></table></div>';
+  if(esPF)h+='<p style="font-size:10px;color:#999;margin-top:6px;font-style:italic">Patrimonio Familiar = Patrimonio Familiar (Ley 3 de 1985). Solo para vivienda principal.</p>';
+
+  /* -- GRÁFICO -- */
+  if(esPF){
+    var mx=1;proy.forEach(function(f){if(f.i>mx)mx=f.i;if(f.p>mx)mx=f.p;});
+    h+='<div style="border:1px solid var(--bd);border-radius:12px;padding:16px;margin-top:14px;background:#fafff7">';
+    h+='<p style="font-size:13px;font-weight:700;color:var(--vd);margin-bottom:6px">Comparativa Gráfica</p>';
+    // Leyenda
+    h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:10px;background:#f0f7ea;border-radius:8px;border:1px solid var(--bd)">';
+    h+='<div style="font-size:10px;font-weight:700;color:var(--vd);width:100%;margin-bottom:4px">RÉGIMEN ACTUAL</div>';
+    h+='<span style="font-size:10px;display:flex;align-items:center;gap:5px"><span style="width:14px;height:10px;background:#1a5c0a;display:inline-block;border-radius:2px"></span> Con exoneración</span>';
+    h+='<span style="font-size:10px;display:flex;align-items:center;gap:5px"><span style="width:14px;height:10px;background:#5db82e;display:inline-block;border-radius:2px"></span> Sin exoneración</span>';
+    h+='<div style="font-size:10px;font-weight:700;color:var(--na);width:100%;margin-top:6px;margin-bottom:4px">PATRIMONIO FAMILIAR</div>';
+    h+='<span style="font-size:10px;display:flex;align-items:center;gap:5px"><span style="width:14px;height:10px;background:var(--na);display:inline-block;border-radius:2px"></span> Conviene (más bajo)</span>';
+    h+='<span style="font-size:10px;display:flex;align-items:center;gap:5px"><span style="width:14px;height:10px;background:#f5c480;display:inline-block;border-radius:2px"></span> No conviene</span>';
+    h+='<div style="font-size:10px;color:#666;width:100%;margin-top:4px;padding-top:4px;border-top:1px solid var(--bd)">💡 La barra <strong>más oscura y sólida</strong> = opción más conveniente</div></div>';
+    proy.forEach(function(f){
+      var wA=Math.max((f.i/mx)*100,2),wP=Math.max((f.p/mx)*100,2);
+      var pfM=f.p<f.i,acM=!pfM;
+      var cA=f.e?'#1a5c0a':'#5db82e',cP=pfM?'var(--na)':'#f5c480';
+      if(cambio===f.y&&pfM){
+        h+='<div style="background:rgba(200,151,30,.07);border:1.5px solid var(--or);border-radius:8px;padding:8px 6px 4px;margin:10px 0 4px">';
+        h+='<div style="text-align:center;font-size:10px;font-weight:700;color:var(--or);margin-bottom:8px">↓ Desde aquí conviene cambiar a Patrimonio Familiar</div>';
+      }
+      h+='<div style="margin-bottom:6px">';
+      // Barra Régimen Actual
+      h+='<div class="fb"><span class="fan" style="font-weight:700;color:'+(acM?'#333':'#bbb')+'">'+f.y+'</span>';
+      h+='<div style="flex:1"><div class="bar" style="width:'+wA+'%;background:'+cA+';opacity:'+(acM?'1':'0.25')+'"></div></div>';
+      h+='<div style="min-width:95px;text-align:right;font-size:10px;font-weight:'+(acM?'700':'400')+';color:'+(acM?'#1a5c0a':'#bbb')+'">'+FM(f.i)+(acM?' ✓':'')+'</div></div>';
+      h+='<div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;padding-left:36px"><span style="font-size:9px;color:'+(acM?'#1a5c0a':'#bbb')+';font-weight:600">'+(f.e?'🟢 Régimen Actual (con exoneración)':'🟢 Régimen Actual (sin exoneración)')+'</span></div>';
+      // Barra Patrimonio Familiar
+      h+='<div class="fb"><span class="fan"></span>';
+      h+='<div style="flex:1"><div class="bar" style="width:'+wP+'%;background:'+cP+';opacity:'+(pfM?'1':'0.4')+'"></div></div>';
+      h+='<div style="min-width:95px;text-align:right;font-size:10px;font-weight:'+(pfM?'700':'400')+';color:'+(pfM?'var(--na)':'#ccc')+'">'+FM(f.p)+(pfM?' ✓':'')+'</div></div>';
+      h+='<div style="display:flex;align-items:center;justify-content:space-between;padding-left:36px;margin-bottom:2px">';
+      h+='<span style="font-size:9px;color:'+(pfM?'var(--na)':'#ccc')+';font-weight:600">🟠 Patrimonio Familiar</span>';
+      if(pfM)h+='<span style="font-size:9px;font-weight:700;color:var(--vd)">Ahorra '+FM(f.i-f.p)+'/año</span>';
+      h+='</div>';
+      h+='</div><div style="height:1px;background:rgba(0,0,0,.05);margin:2px 0 6px"></div>';
+      if(cambio===f.y&&pfM)h+='</div>';
+    });
+    if(cambio){
+      var ahP=0;proy.forEach(function(f){if(f.y>=cambio)ahP+=f.i-f.p;});
+      h+='<div style="background:var(--oc);border:2px solid var(--or);border-radius:10px;padding:12px;margin-top:12px;text-align:center"><p style="font-size:14px;font-weight:700;color:var(--vd)">A partir de '+MS[mc]+' de '+cambio+' conviene Patrimonio Familiar</p><p style="font-size:13px;color:var(--ts);margin-top:4px">Ahorro acumulado: <strong style="font-size:17px;color:var(--vd)">'+FM(ahP)+'</strong></p></div>';
+    }else{
+      h+='<div style="background:var(--vc);border:2px solid var(--vv);border-radius:10px;padding:12px;margin-top:12px;text-align:center"><p style="font-size:13px;font-weight:700;color:var(--vd)">El Régimen Actual es más favorable durante los 20 años.</p></div>';
+    }
+    h+='</div>';
+  }
+
+  /* -- NOTA: SIN PATRIMONIO FAMILIAR (inversión/alquiler) -- */
+  if((tp==='casa'||tp==='ph')&&uso!=='si'){
+    h+='<div class="tar"><div style="background:#fdf3e0;border:1.5px solid var(--na);border-left:5px solid var(--na);border-radius:10px;padding:12px 14px">';
+    h+='<p style="font-size:12px;font-weight:700;color:var(--na);margin-bottom:4px">Patrimonio Familiar no aplica</p>';
+    h+='<p style="font-size:12px;color:var(--ts);line-height:1.6">El régimen de Patrimonio Familiar (Ley 3 de 1985) aplica <strong>exclusivamente a vivienda principal</strong>. Para inmuebles de inversión o alquiler no está disponible esta opción.</p>';
+    h+='</div></div>';
+  }
+
+  /* -- RECOMENDACIÓN -- */
+  if(esPF){
+    var iAct=iAnio(HOY,aiE,ae,tp,tr,mj),iPFa=iPF(tot),iSin=iTG(tot);
+    var dE=iPFa-iAct,dS=iSin-iPFa,nS=Math.max(0,20-rest),a2=Math.max(HOY,afE);
+    h+='<div class="rec"><h4>Recomendación'+(nm?' para '+nm:'')+'</h4>';
+    h+=uso==='si'?'<p style="font-size:11px;color:#8edb50;margin-bottom:10px">Vivienda Principal — califica para Patrimonio Familiar.</p>':'<p style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:10px">Inversión/Alquiler — Patrimonio Familiar solo aplica a vivienda principal.</p>';
+    if(rest>0){
+      h+='<div style="background:rgba(255,255,255,.06);border-radius:10px;padding:12px;margin-bottom:10px"><p style="font-size:12px;font-weight:700;color:#fff;margin-bottom:8px">'+HOY+' al '+(afE-1)+' ('+rest+' año(s) con exoneración)</p>';
+      h+='<p style="font-size:11px;color:rgba(255,255,255,.7);line-height:2.2">Régimen actual: <strong>'+FM(iAct)+'/año</strong><br>P.Familiar: <strong>'+FM(iPFa)+'/año</strong><br>';
+      h+=dE>0?'Actual más económico en <strong style="color:#8edb50">'+FM(dE)+'/año</strong>':'Patrimonio Familiar más económico en <strong style="color:#8edb50">'+FM(Math.abs(dE))+'/año</strong>';
+      h+='</p></div>';
+    }
+    if(nS>0){
+      h+='<div style="background:rgba(255,255,255,.06);border-radius:10px;padding:12px;margin-bottom:10px"><p style="font-size:12px;font-weight:700;color:#fff;margin-bottom:8px">'+a2+' al '+(HOY+19)+' ('+nS+' año(s) sin exoneración)</p>';
+      h+='<p style="font-size:11px;color:rgba(255,255,255,.7);line-height:2.2">Régimen actual: <strong>'+FM(iSin)+'/año</strong><br>P.Familiar: <strong>'+FM(iPFa)+'/año</strong><br>';
+      h+=dS>0?'Patrimonio Familiar ahorra <strong style="color:#8edb50">'+FM(dS)+'/año</strong> (total '+FM(dS*nS)+')':'Actual sigue siendo más favorable.';
+      h+='</p></div>';
+    }
+    h+='<div style="background:rgba(255,255,255,.09);border-radius:10px;padding:14px;border:1px solid rgba(142,219,80,.2)"><p style="font-size:13px;font-weight:700;color:#8edb50;margin-bottom:8px">📋 Plan de Acción</p>';
+    var neto=(dE<0?Math.abs(dE)*rest:0)+(dS>0?dS*nS:0);
+    if(rest===0&&dS>0)h+='<p style="font-size:12px;color:rgba(255,255,255,.85);line-height:1.9">Exoneración vencida. Tramite Patrimonio Familiar Ahorro: <strong>'+FM(dS)+'/año</strong> ('+FM(dS*20)+' en 20 años).</p>';
+    else if(rest===0&&dS<=0)h+='<p style="font-size:12px;color:rgba(255,255,255,.85)">Régimen general más favorable. No cambiar.</p>';
+    else if(rest>0&&dE>=0&&dS>0)h+='<p style="font-size:12px;color:rgba(255,255,255,.85);line-height:1.9">Mantenga régimen actual durante exoneración. <strong>Antes de '+mF+'</strong> tramite Patrimonio Familiar Ahorro neto 20 años: <strong style="color:#8edb50">'+FM(neto)+'</strong>.</p>';
+    else if(dE<0)h+='<p style="font-size:12px;color:rgba(255,255,255,.85)">Patrimonio Familiar ya es más económico. Tramítelo ahora. Ahorro: <strong>'+FM(Math.abs(dE))+'/año</strong>.</p>';
+    else h+='<p style="font-size:12px;color:rgba(255,255,255,.85)">Régimen actual más favorable en el período proyectado.</p>';
+    h+='</div></div>';
+  }
+
+  h+='<div id="pdf-pie" style="display:none;text-align:center;padding:12px 0;border-top:2px solid var(--vd);margin-top:12px;font-size:9px;color:#aaa">';
+  h+='<strong style="color:var(--vd)">INVERSIONES DIMSA, S.A.</strong> — Asesoría Fiscal — Panamá 2026 — WhatsApp: 6613-2826</div></div>';
+  $('res').innerHTML=h;
+  if(ses.u&&ses.m==='premium'){ await registrarYAvisarConsulta(); }
+}
+
+/* ============================================================ CHAT IA
+   Sistema construido dinámicamente cada vez que se activa el tab.
+   Historial limpio al iniciar sesión (se resetea en initApp).
+   Prompt del sistema incluye TODAS las reglas fiscales del programa.
+============================================================ */
+var SYS_IA = [
+  '=== ROL Y COMPORTAMIENTO ===',
+  'Eres el Asesor Fiscal Inteligente de DIMSA Fiscal — plataforma especializada en Impuesto de Inmueble de Panamá.',
+  'Tu nombre es "Asesor Fiscal DIMSA". Respondes ÚNICAMENTE en español, de forma clara, precisa y máximo 400 palabras.',
+  '',
+  '=== REGLAS ABSOLUTAS — NUNCA VIOLAR ===',
+  '',
+  'REGLA 1 — FUENTE ÚNICA:',
+  'Tu única fuente de información es la BASE DE CONOCIMIENTO DE DIMSA FISCAL que está detallada abajo.',
+  'NUNCA uses conocimiento externo, datos de internet, ni información que no esté explícitamente en esta base.',
+  'Si la respuesta está en la base de conocimiento: responde con esa información exacta.',
+  'Si NO está en la base de conocimiento: di exactamente esto:',
+  '"Esta consulta está fuera del alcance de mi base de conocimiento actual.',
+  'Le recomiendo consultar directamente con la DGI de Panamá (dgi.mef.gob.pa) o con un asesor fiscal certificado."',
+  '',
+  'REGLA 2 — PROHIBICIONES ABSOLUTAS:',
+  '❌ NUNCA inventes leyes, artículos, tasas, fechas o porcentajes',
+  '❌ NUNCA menciones leyes que no estén en esta base de conocimiento',
+  '❌ NUNCA respondas sobre otros impuestos (renta, ITBMS, municipal) que no sean Impuesto de Inmueble',
+  '❌ NUNCA des consejos legales o contables que vayan más allá del impuesto de inmueble',
+  '❌ NUNCA digas "según entiendo" o "creo que" — si no estás seguro, usa la Regla 1',
+  '',
+  'REGLA 3 — CÁLCULOS:',
+  'Cuando calcules, muestra SIEMPRE el procedimiento paso a paso.',
+  'Cita la ley aplicable en cada cálculo.',
+  'Menciona si el resultado es exacto o estimado.',
+  '',
+  'REGLA 4 — TEMAS FUERA DE ALCANCE:',
+  'Si preguntan sobre otros temas fiscales (impuesto sobre la renta, ITBMS, planilla, etc.) responde:',
+  '"Soy especialista exclusivamente en Impuesto de Inmueble de Panamá.',
+  'Para consultas sobre otros impuestos, le recomiendo contactar a la DGI o a un contador público autorizado."',
+  '',
+  'REGLAS PARA CÁLCULOS CON VALOR TOTAL SIN DESGLOSE:',
+  '8. Si el usuario da solo UN valor total de la propiedad (sin separar terreno y mejoras), calcula con ese valor total como ESTIMADO.',
+  '9. Al final de cualquier cálculo donde no se dio el desglose, SIEMPRE agrega este aviso:',
+  '   "⚠️ IMPORTANTE: Este cálculo es una ESTIMACIÓN basada en el valor total que indicó.',
+  '   Para calcular el impuesto EXACTO necesitamos:',
+  '   • Valor del TERRENO por separado (B/.)',
+  '   • Valor de las MEJORAS por separado (B/.)',
+  '   Ambos valores deben sumar B/.[valor total que indicó].',
+  '   Use la calculadora de DIMSA Fiscal ingresando estos valores por separado para obtener el resultado preciso."',
+  '10. Si el usuario da terreno Y mejoras por separado, verifica que sumen correctamente y confirma: "Terreno B/.X + Mejoras B/.Y = Total B/.Z ✓". Si no cuadran, pídele que corrija.',
+  '',
+  '=== BASE DE CONOCIMIENTO PRIMARIA — DIMSA FISCAL ===',
+  '',
+  '--- IMPUESTO DE INMUEBLE ANUAL ---',
+  '',
+  'TABLA GENERAL — Ley 66 de 2017:',
+  'Primeros B/.30,000: EXENTO (tasa 0%)',
+  'B/.30,001 a B/.250,000: 0.6% sobre el exceso de B/.30,000',
+  'B/.250,001 a B/.500,000: B/.1,320 + 0.8% sobre el exceso de B/.250,000',
+  'Más de B/.500,000: B/.3,320 + 1.0% sobre el exceso de B/.500,000',
+  '',
+  'PATRIMONIO FAMILIAR — Ley 3/1985, modificada por Ley 62/2003 y Ley 66/2017:',
+  '',
+  'CUÁNDO APLICA (requisitos para acogerse):',
+  '  ✅ Vivienda PRINCIPAL del propietario (donde vive permanentemente con su familia)',
+  '  ✅ Persona natural — trámite directo ante la DGI',
+  '  ✅ Persona jurídica (Sociedad Anónima o Fundación de Interés Privado) — SÍ PUEDE APLICAR con requisitos adicionales:',
+  '     • Todos los beneficiarios finales de la sociedad deben ser miembros de la misma familia',
+  '     • El 100% de las acciones debe estar certificado por un Contador Público Autorizado (CPA)',
+  '     • Todos los accionistas deben presentar declaración jurada indicando que la finca es su Patrimonio Familiar',
+  '     • En caso de Fideicomiso: los fundadores o beneficiarios finales deben certificar mediante declaración jurada',
+  '  ✅ Solo UNA propiedad puede acogerse como Patrimonio Familiar por familia',
+  '  ✅ Extranjeros residentes tienen los mismos derechos que panameños',
+  '  ✅ Jubilados y pensionados también pueden acogerse',
+  '',
+  'CUÁNDO NO APLICA:',
+  '  ❌ Propiedades de inversión o alquiler',
+  '  ❌ Segundas residencias (casas de playa, campo, etc.)',
+  '  ❌ Locales comerciales o terrenos solos',
+  '  ❌ Propiedades de uso mixto (comercial y residencial) no segregadas',
+  '  ❌ Si ya tiene otra propiedad inscrita como Patrimonio Familiar',
+  '  ❌ Sociedades donde los accionistas NO son 100% de la misma familia',
+  '',
+  'NOTA IMPORTANTE SOBRE SOCIEDADES:',
+  'Si la propiedad está a nombre de una sociedad anónima, SÍ puede acogerse a Patrimonio Familiar',
+  'SIEMPRE QUE todos los accionistas sean familiares y el 100% de las acciones esté en manos de la familia.',
+  'Se requiere certificación de CPA y declaración jurada de todos los accionistas.',
+  '',
+  'TARIFAS PATRIMONIO FAMILIAR:',
+  'Primeros B/.120,000: EXENTO (vs B/.30,000 exentos en Tabla General)',
+  'B/.120,001 a B/.700,000: 0.5% sobre el exceso de B/.120,000',
+  'Más de B/.700,000: B/.2,900 + 0.7% sobre el exceso de B/.700,000',
+  '',
+  'REGLAS PARA EL ASESOR AL RESPONDER SOBRE PATRIMONIO FAMILIAR:',
+  '',
+  'REGLA PF-1: Cuando el usuario pregunte sobre Patrimonio Familiar o calcule el impuesto bajo ese régimen,',
+  'SIEMPRE explicar primero si aplica o no según el tipo de propiedad que describió.',
+  '',
+  'REGLA PF-2 — PROTOCOLO COMPLETO CUANDO PREGUNTAN POR PATRIMONIO FAMILIAR O CONVENIENCIA DE CAMBIO:',
+  '',
+  'PASO A — Verificar exoneración PRIMERO:',
+  'Antes de recomendar cuándo cambiarse, SIEMPRE preguntar si la propiedad tiene exoneración vigente.',
+  'Decir al usuario:',
+  '"Para determinar con exactitud en qué año le conviene cambiarse al régimen de Patrimonio Familiar,',
+  'necesito saber si su propiedad tiene exoneración activa y hasta cuándo.",',
+  '"Si tiene exoneración vigente, mientras dure el período de exoneración sus mejoras no pagan impuesto.',
+  'El cambio de régimen tiene más impacto DESPUÉS de que venza la exoneración.",',
+  '"Para calcular su período de exoneración necesito:"',
+  '  • Valor de las mejoras (construcción) en B/.',
+  '  • Mes y año del permiso de construcción (si solo tiene el año, el resultado será estimado)',
+  '  • Mes y año del permiso de ocupación (si solo tiene el año, el resultado será estimado)',
+  '  • Opcionalmente: mes y año de inscripción de mejoras en Registro Público (mejora la precisión)',
+  '"Con más información obtendrá un cálculo más exacto del período de exoneración y del año en que conviene el cambio."',
+  '',
+  'PASO B — Si el usuario ya tiene la información de exoneración o no tiene exoneración:',
+  'Calcular bajo AMBOS regímenes para el año actual y para cuando venza la exoneración.',
+  'Mostrar tabla comparativa:',
+  '  Año | Estado exoneración | Régimen General (B/.) | Patrimonio Familiar (B/.) | Ahorro (B/.) | Recomendación',
+  'Incluir el año en que vence la exoneración como punto de inflexión clave.',
+  'Indicar claramente: "A partir de [año de vencimiento], le conviene estar en Patrimonio Familiar porque ahorra B/.X al año."',
+  '',
+  'PASO C — Calcular el ahorro acumulado:',
+  'Mostrar cuánto ahorra en total si se cambia en el año correcto vs si se cambia tarde o nunca.',
+  'Ejemplo: "Si se cambia en 2027 (cuando vence su exoneración), ahorrará B/.X al año.',
+  'En 10 años eso representa un ahorro de B/.XX."',
+  '',
+  'REGLA PF-3: Si el comparativo muestra que Patrimonio Familiar es MÁS CARO:',
+  '"En su caso, el Régimen General le resulta más conveniente porque el valor de su propiedad',
+  'está por debajo de B/.120,000 o la diferencia no justifica el trámite."',
+  '',
+  'REGLA PF-4: Si Patrimonio Familiar conviene, SIEMPRE agregar:',
+  '"Para acogerse debe presentar declaración jurada en la DGI indicando que es su vivienda principal.',
+  'El trámite no tiene costo y tarda aproximadamente 3 meses en ser aprobado.',
+  'El beneficio aplica a partir del año fiscal siguiente a la aprobación.',
+  'Le recomiendo iniciar el trámite con anticipación antes del año en que conviene el cambio."',
+  '',
+  'CUÁNDO CONVIENE CAMBIARSE — GUÍA RÁPIDA:',
+  '  - Propiedad ≤ B/.30,000: Tabla General ya exenta → Patrimonio Familiar no agrega beneficio',
+  '  - Propiedad B/.30,001 a B/.120,000: Patrimonio Familiar siempre conviene → cambiarse cuanto antes',
+  '  - Propiedad B/.120,001 a B/.250,000: Comparar según valor exacto → generalmente conviene PF',
+  '  - Propiedad > B/.250,000: Patrimonio Familiar conviene más → calcular ahorro exacto',
+  '  - Con exoneración vigente: evaluar cambio para cuando VENZA la exoneración',
+  '',
+  'EXONERACIÓN DE MEJORAS:',
+  'REGLA FUNDAMENTAL: La exoneración aplica SOLO a las MEJORAS (construcción/edificación). El TERRENO NUNCA se exonera.',
+  '',
+  'Durante exoneración vigente:',
+  '  - Casa o Lote: terreno paga Tabla General sobre su valor, mejoras = B/.0',
+  '  - PH (Propiedad Horizontal): terreno paga 1% fijo (Ley 8/2010), mejoras = B/.0',
+  '  - Terreno solo: NO tiene exoneración. Siempre paga Tabla General sobre su valor.',
+  '  - Local Comercial: Puede tener exoneración de mejoras (10 años según Ley 28/2012). Terreno paga Tabla General.',
+  'Sin exoneración activa: Tabla General sobre terreno + mejoras (valor total combinado).',
+  '',
+  'IMPORTANTE SOBRE TERRENOS:',
+  'Si el usuario pregunta por exoneración de un terreno solo, responder:',
+  '"Los terrenos NO tienen exoneración de impuesto de inmueble. Solo las construcciones (mejoras) pueden exonerarse.',
+  'Para un terreno, el impuesto se calcula según la Tabla General sobre el valor catastral del terreno."',
+  '',
+  'PERÍODOS DE EXONERACIÓN POR LEY:',
+  'La ley aplicable se determina por la fecha de referencia (en orden de prioridad):',
+  '  1. Fecha inscripción de mejoras en Registro Público (más exacta)',
+  '  2. Fecha permiso de ocupación (segunda prioridad)',
+  '  3. Fecha permiso de construcción (solo establece elegibilidad)',
+  '',
+  'Antes de enero 2004 (régimen anterior): 20 años para todos',
+  'Ley 61/2002 (ene 2004 – ago 2005): Casa ≤B/.100K→15 años, ≤B/.250K→10 años, más→5 años',
+  'Ley 50/2004 (ago 2005 – 10 abr 2008): Casa ≤B/.100K→15 años, ≤B/.250K→10 años, más→5 años; Comercial→10 años',
+  'Ley 21/2008 (10 abr 2008 – jun 2009): 20 años para todos los residenciales',
+  'Ley 21/2008 + Ley 49/2009 (jun 2009 – dic 2011): ≤B/.80K→20 años, ≤B/.100K→15 años, ≤B/.250K→10 años, más→5 años',
+  'Ley 28/2012 (desde 2012 en adelante): ≤B/.120K→20 años, ≤B/.300K→10 años, más→5 años; Comercial→10 años',
+  'Ley 66/2017: Solo modifica las TARIFAS del impuesto (Tabla General), NO otorga ni modifica exoneraciones.',
+  '',
+  'REGLAS PARA PREGUNTAS SOBRE AÑOS DE EXONERACIÓN:',
+  'Si el usuario pregunta cuántos años de exoneración tiene su propiedad, SIEMPRE seguir este protocolo:',
+  '',
+  'PASO 1 — Verificar tipo de propiedad:',
+  '  - Si es TERRENO SOLO: responder inmediatamente que los terrenos no tienen exoneración.',
+  '  - Si es PH/Apartamento: aclarar que el terreno SIEMPRE paga 1% aunque esté en exoneración.',
+  '  - Si es Casa, PH o Local: continuar con PASO 2.',
+  '',
+  'PASO 2 — Solicitar información necesaria si no fue proporcionada:',
+  '  Información REQUERIDA para determinar los años:',
+  '  a) Valor de las MEJORAS (construcción) en B/. — determina la tabla de años',
+  '  b) Mes y año del permiso de construcción — preferiblemente mes y año (si solo año: resultado es estimado)',
+  '  c) Mes y año del permiso de ocupación — preferiblemente mes y año (si solo año: resultado es estimado)',
+  '  Información OPCIONAL pero mejora la precisión:',
+  '  d) Mes y año de inscripción de mejoras en Registro Público',
+  '',
+  'PASO 3 — Advertencias según información disponible:',
+  '  - Si el usuario da solo el AÑO (sin mes): "⚠️ Sin el mes exacto, el resultado es un ESTIMADO. El mes puede cambiar la ley aplicable."',
+  '  - Si no da la fecha de inscripción de mejoras: "ℹ️ Sin la fecha de inscripción de mejoras, usamos el permiso de ocupación como referencia. El período real puede variar."',
+  '  - Mientras más información proporcione, más exacto será el cálculo.',
+  '',
+  'PASO 4 — Al calcular, mostrar:',
+  '  - Ley aplicable según la fecha de referencia',
+  '  - Años de exoneración correspondientes al valor de mejoras',
+  '  - Fecha de inicio (la que ocurra PRIMERO entre ocupación e inscripción de mejoras)',
+  '  - Fecha aproximada de vencimiento',
+  '  - Si ya venció o sigue vigente en 2026',
+  '  - Para PH: recordar que el terreno pagará 1% aunque la exoneración esté vigente',
+  '',
+  '--- IMPUESTOS AL VENDER UNA PROPIEDAD ---',
+  '',
+  'ITBI — Impuesto de Transferencia de Bienes Inmuebles:',
+  'Tasa: 2% sobre el MAYOR entre precio de venta y valor catastral actualizado.',
+  'Valor catastral actualizado = Valor catastral original + (5% × años de tenencia).',
+  'Se paga SIEMPRE, incluso en donaciones.',
+  'Formulario 106 en eTax 2.0 de la DGI. Plazo: 10 días hábiles desde la escritura.',
+  '',
+  'GANANCIA DE CAPITAL (ISR por enajenación):',
+  'Solo aplica si NO es giro ordinario del vendedor (persona que vende su propiedad personal).',
+  'OPCIÓN A — 3% definitivo: 3% sobre el mayor entre precio venta y valor catastral actualizado.',
+  '  → No requiere incluir en declaración de renta anual. Es impuesto definitivo.',
+  'OPCIÓN B — 10% sobre ganancia neta:',
+  '  → Ganancia = Precio venta − Valor catastral actualizado − Gastos de enajenación',
+  '  → Se paga 3% como adelanto al momento de vender',
+  '  → En declaración de renta anual se liquida el 10% real',
+  '  → Si el 10% real < adelanto pagado: se puede pedir DEVOLUCIÓN a la DGI',
+  '  → Si el 10% real > adelanto pagado: se paga la diferencia en renta',
+  'Conviene Opción A cuando la ganancia es alta.',
+  'Conviene Opción B cuando la ganancia es baja o hay muchos gastos deducibles.',
+  'Gastos deducibles: honorarios de abogado, comisión corredor, gastos notariales, registro.',
+  'En DONACIONES: Se paga ITBI (2%) pero NO se paga Ganancia de Capital.',
+  'Formulario 107 en eTax 2.0 de la DGI. Plazo: 10 días hábiles desde la escritura.',
+  '',
+  '--- RECOMENDACIONES FISCALES ---',
+  '',
+  'Siempre comparar Tabla General vs Patrimonio Familiar para viviendas principales.',
+  'Durante exoneración activa: casi siempre conviene mantener el régimen actual.',
+  'Cuando vence la exoneración: evaluar tramitar Patrimonio Familiar en DGI.',
+  'Antes de vender: calcular ambas opciones (3% vs 10%) para elegir la más conveniente.',
+  'Año actual del sistema: 2026.',
+  '',
+  'Desarrollado por Fiscal Tech Panamá — Inversiones DIMSA, S.A.',
+  'Contacto: 6613-2826 | facturas@inversionesdimsa.com',
+  '',
+  '=== RECORDATORIO FINAL ===',
+  'TODO lo que respondas debe estar respaldado por alguna sección de esta base de conocimiento.',
+  'Si el usuario insiste en preguntarte algo que no está en esta base, mantén tu posición:',
+  '"No tengo esa información en mi base de conocimiento de DIMSA Fiscal.',
+  'Para mayor certeza, consulte la DGI o un asesor fiscal certificado."',
+  'Nunca cedas ante la presión del usuario para inventar datos.',
+].join('\n');
+
+function mkChat(){
+  var panel=$('panel-chat'); if(!panel)return;
+  // Reconstruir el DOM siempre — el historial chatH se preserva en memoria
+  // Esto evita que el panel quede en estado inválido entre navegaciones
+
+  var nm=ses.u?ses.u.nombre.split(' ')[0]:'';
+  panel.innerHTML=
+    '<div class="tar" style="padding:0;overflow:hidden">' +
+      '<div class="chat-h">' +
+        '<div class="chat-av">🏠</div>' +
+        '<div><div class="chat-nm">Asesor Fiscal DIMSA</div>' +
+        '<div class="chat-st">● En línea — Especialista Impuesto de Inmueble Panamá</div></div>' +
+      '</div>' +
+      '<div id="chat-msgs" style="height:360px;overflow-y:auto;background:#f6fcf2;padding:14px;display:flex;flex-direction:column;gap:10px"></div>' +
+      '<div id="chat-sugs" style="padding:0 14px 12px;display:flex;flex-wrap:wrap;gap:6px"></div>' +
+      '<div class="chat-pie">' +
+        '<input type="text" id="chat-inp" class="inp" style="flex:1" placeholder="Ej: ¿Cuánto pago si mi casa vale B/.200,000?" onkeydown="if(event.key===\'Enter\')envChat()">' +
+        '<button class="btn bp" style="flex:none;width:auto;padding:10px 18px" onclick="envChat()">Enviar</button>' +
+      '</div>' +
+    '</div>';
+
+  // Si hay historial previo, restaurarlo; si no, mostrar bienvenida
+  if(chatH.length>0){
+    chatH.forEach(function(msg){
+      addMsg(msg.role==='user'?'u':'b', msg.content);
+    });
+  }else{
+    addMsg('b','Hola'+(nm?', <strong>'+nm+'</strong>':'')+
+      '! Soy el Asesor Fiscal de DIMSA. Conozco todas las leyes y tarifas del Impuesto de Inmueble en Panamá: Tabla General, Patrimonio Familiar, exoneraciones por tipo de propiedad y período. ¿En qué le ayudo?');
+  }
+
+  // Sugerencias rápidas — solo si es la primera vez (sin historial)
+  if(chatH.length===0){
+  var sugs=[
+    '¿Cuánto pago si mi PH vale B/.300,000?',
+    '¿Qué es Patrimonio Familiar?',
+    '¿Cuántos años de exoneración me corresponden?',
+    '¿Cómo calculo impuesto de un terreno?',
+    '¿Cuándo conviene tramitar Patrimonio Familiar?'
+  ];
+  var el=$('chat-sugs');
+  if(el){
+    sugs.forEach(function(s){
+      var b=document.createElement('button');
+      b.textContent=s;
+      b.style.cssText='background:var(--vc);border:1px solid var(--bd);color:var(--vd);padding:5px 10px;border-radius:16px;font-size:10px;cursor:pointer;font-family:inherit';
+      b.onclick=function(){ b.parentNode.remove(); $('chat-inp').value=s; envChat(); };
+      el.appendChild(b);
+    });
+  }
+  }  // fin if(chatH.length===0) para sugerencias
+  setTimeout(function(){ var i=$('chat-inp'); if(i)i.focus(); },100);
+}
+
+async function envChat(){
+  var inp=$('chat-inp'); if(!inp)return;
+  var txt=inp.value.trim(); if(!txt)return;
+  inp.value=''; inp.disabled=true;
+  addMsg('u',txt);
+  chatH.push({role:'user',content:txt});
+  var load=addMsg('b','<em style="color:#aaa">Escribiendo…</em>');
+  try{
+    var sp=SYS_IA+'\n\nUsuario: '+(ses.u?ses.u.nombre+' ('+ses.u.email+')':'Invitado')+'. Modo: '+ses.m+'.';
+    var r=await fetch('/.netlify/functions/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({system:sp, messages:chatH})
+    });
+    var d=await r.json();
+    load.remove();
+    var rep=(d.choices&&d.choices[0]&&d.choices[0].message)?d.choices[0].message.content:'No se pudo obtener respuesta. Intente de nuevo.';
+    addMsg('b',rep);
+    chatH.push({role:'assistant',content:rep});
+  }catch(ex){
+    load.remove();
+    addMsg('b','⚠️ Error al conectar con el Asesor IA. Verifique su conexión a internet e intente de nuevo.<br><small style="color:#aaa">Detalle: '+String(ex)+'</small>');
+    chatH.pop();
+  }
+  inp.disabled=false; inp.focus();
+}
+
+function addMsg(rol,txt){
+  var c=$('chat-msgs'); if(!c)return document.createElement('div');
+  var d=document.createElement('div');
+  d.className='bbl'+(rol==='u'?' u':'');
+  d.innerHTML='<div class="bbl-ic '+(rol==='b'?'b">🏠':'u">👤')+'</div>'+
+    '<div class="bbl-tx '+rol+'">'+txt.replace(/\n/g,'<br>')+'</div>';
+  c.appendChild(d); c.scrollTop=c.scrollHeight; return d;
+}
+
+/* ============================================================ UPGRADE */
+function mkUpgrade(){
+  var nm=ses.u?ses.u.nombre.split(' ')[0]:'';
+  $('panel-upgrade').innerHTML=
+    '<div class="tar" style="border:2px solid var(--or)">' +
+    '<h3 style="color:#7a5c00">Actualizar a Premium'+(nm?' — '+nm:'')+'</h3>' +
+    '<div style="background:var(--oc);border:1.5px solid #e8cf80;border-radius:12px;padding:16px;margin-bottom:14px"><p style="font-size:13px;font-weight:700;color:#7a5c00;margin-bottom:6px">1. Pague B/.3.99 por Yappy</p><div style="background:#fff;border:2px solid var(--or);border-radius:10px;padding:12px;text-align:center"><p style="font-size:30px;font-weight:900;color:var(--vd);letter-spacing:2px">6613-2826</p></div></div>' +
+    '<div style="background:#f5fdf0;border:1.5px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:14px"><p style="font-size:13px;font-weight:700;color:var(--vd);margin-bottom:8px">2. Envíe el comprobante</p><button class="btn bo" style="width:100%;padding:13px" onclick="solUpgrade()">Enviar solicitud ✉️</button></div>' +
+    '<div style="background:#eef2ff;border:1.5px solid #aab0f0;border-radius:12px;padding:16px"><p style="font-size:13px;font-weight:700;color:#5c52d0;margin-bottom:4px">3. Reciba su clave en máx. 24h</p><p style="font-size:12px;color:#777">Le enviaremos su usuario y clave por correo electrónico.</p></div></div>';
+}
+
+function solUpgrade(){
+  var u=ses.u; if(!u)return;
+  modalWA({
+    icono: '💳',
+    titulo: 'Enviar comprobante de pago',
+    subtitulo: 'Cambio de plan Lite a Premium',
+    cajaColor: '#fff8e0',
+    cajaTexto: 'Envíe su comprobante de depósito Yappy por alguno de estos canales:<br><br>'
+      +'📧 Correo: <strong>facturas@inversionesdimsa.com</strong><br>'
+      +'📱 WhatsApp: <strong>6613-2826</strong><br><br>'
+      +'Una vez verificado el pago, recibirá su clave Premium en máximo 24 horas.',
+    btnTexto: 'Confirmar solicitud ✉️',
+    btnCancelarTexto: 'Cancelar',
+    onConfirmar: function(){
+      // Usuario debe enviar comprobante por correo a daibanez@inversionesdimsa.com
+      try{ntf({nombre:u.nombre,tel:u.tel||'',email:u.email,tipo:'upgrade',leido:false,fecha:new Date().toLocaleString('es-PA')});}catch(xr){}
+      $('panel-upgrade').innerHTML='<div class="tar" style="border:2px solid var(--vv);text-align:center;padding:32px"><div style="font-size:64px">✅</div><h3 style="font-size:18px;color:var(--vd);margin:10px 0">¡Solicitud registrada!</h3>'
+        +'<p style="color:var(--ts);line-height:1.8">Env\u00ede su comprobante de dep\u00f3sito Yappy a:<br>'
+        +'📧 <strong>facturas@inversionesdimsa.com</strong><br>'
+        +'📱 WhatsApp: <strong>6613-2826</strong><br><br>'
+        +'Recibir\u00e1 su clave Premium en m\u00e1ximo 24 horas.</p></div>';
+    }
+  });
+}
+
+/* ============================================================ ADMIN */
+var _AU=[],_NK=[];
+
+async function mkAdmin(){
+  var panel=$('panel-admin'); if(!panel)return;
+  // Siempre reconstruir para datos frescos
+  panel.innerHTML=
+    '<div class="tar">' +
+    '<h3>Panel de Administración</h3><div id="adm-msg"></div>' +
+    '<div class="sec"><h4>Notificaciones</h4>' +
+    '<div id="adm-ntf" style="font-size:11px;color:#aaa;padding:6px">Cargando…</div>' +
+    '<div style="display:flex;gap:8px;margin-top:8px">' +
+    '<button class="bmic" style="background:var(--vc);color:var(--vd);padding:8px 14px;font-size:12px" onclick="mkNtfLeer()">Marcar leídas</button>' +
+    '<button class="bmic" style="background:#fde8e6;color:var(--ro);padding:8px 14px;font-size:12px" onclick="mkNtfBorrar()">Borrar todas</button>' +
+    '</div></div>' +
+    '<div class="sec"><h4>Usuarios Lite</h4><div id="adm-lite" style="font-size:11px;color:#aaa;padding:6px">Cargando…</div></div>' +
+    '<div class="sec"><h4>Asignar Clave Premium</h4>' +
+    '<div class="g2">' +
+    '<div><label>Correo del usuario</label><input id="ad-em" class="inp" placeholder="usuario@email.com" oninput="adBuscar()"></div>' +
+    '<div><label>Clave</label><div style="display:flex;gap:6px"><input id="ad-cl" class="inp" placeholder="Clave"><button class="bmic" style="background:var(--vc);color:var(--vd);padding:10px 12px;font-size:11px" onclick="adGenCl()">Auto</button></div></div>' +
+    '</div>' +
+    '<div id="ad-inf" style="display:none;background:var(--oc);border:1.5px solid #e8cf80;border-radius:9px;padding:9px 12px;margin-top:8px;font-size:12px;color:#555"></div>' +
+    '<div class="g2" style="margin-top:10px">' +
+    '<div><label>Máx. consultas</label><input id="ad-lm" type="number" class="inp" value="30"></div>' +
+    '<div><label>Fecha vencimiento</label><input id="ad-vc" type="date" class="inp"></div>' +
+    '</div>' +
+    '<button class="btn bo" style="margin-top:12px;padding:11px 22px" onclick="adAsignar()">Asignar Premium ⭐</button></div>' +
+    '<div class="sec"><h4>Usuarios Premium / Admin</h4>' +
+    '<p style="font-size:10px;color:#999;margin-bottom:8px">Reset de consultas · Desactivar · Eliminar</p>' +
+    '<div id="adm-prem" style="font-size:11px;color:#aaa;padding:6px">Cargando…</div></div>' +
+    '</div>';
+
+  // Fecha default: 1 año
+  var df=new Date(); df.setFullYear(df.getFullYear()+1);
+  $('ad-vc').value=df.toISOString().split('T')[0];
+
+  // Cargar datos
+  await adNtf();
+  await adUsers();
+}
+
+async function adNtf(){
+  _NK=[];
+  var ks=await sl('ntf-',true); _NK=ks.sort().reverse();
+  var h='';
+  for(var i=0;i<Math.min(_NK.length,30);i++){
+    try{
+      var raw=await sg(_NK[i],true); if(!raw)continue;
+      var n=JSON.parse(raw);
+      var nu=!n.leido,up=n.tipo==='upgrade';
+      h+='<div style="padding:8px 10px;background:'+(nu?'#fffcf0':'#f9f9f9')+';border:1px solid '+(nu?'#e8cf80':'#e5e5e5')+';border-radius:8px;margin-bottom:5px;'+(nu?'border-left:4px solid '+(up?'var(--vv)':'var(--or)'):'')+'">';
+      h+='<div style="font-size:12px;font-weight:700;color:'+(nu?(up?'var(--vd)':'var(--or)'):'#666')+'">'+(nu?(up?'⭐ UPGRADE ':'🆕 NUEVO '):'')+n.nombre+'</div>';
+      h+='<div style="font-size:10px;color:#888">'+n.email+' | '+(n.tel||'—')+' | '+n.fecha+'</div></div>';
+    }catch(x){}
+  }
+  var el=$('adm-ntf'); if(el)el.innerHTML=h||'<p style="font-size:11px;color:#bbb;padding:4px">Sin notificaciones.</p>';
+}
+
+async function adUsers(){
+  _AU=[];
+  var ks=await sl('u-'); var hL='',hP='';
+  for(var i=0;i<ks.length;i++){
+    var raw=await sg(ks[i]); if(!raw)continue;
+    var u; try{u=JSON.parse(raw);}catch(x){continue;}
+    if(!u||!u.email)continue;
+    var idx=_AU.length; _AU.push(u.email);
+    var uso=await gC(u.email);
+    if(u.role==='admin'){
+      hP+='<div class="fur"><div class="fi"><div class="fn">🔧 '+u.nombre+'</div><div class="fd">'+u.email+' | Pass: '+u.pass+'</div></div></div>';
+    }else if(u.role==='premium'){
+      var vx=EXP(u.vence);
+      hP+='<div class="fur" style="'+(vx?'border-color:var(--ro);background:#fff5f5':'')+'">'+
+          '<div class="fi"><div class="fn">'+u.nombre+(vx?' <span style="color:var(--ro);font-size:9px">[VENCIDO]</span>':'')+'</div>'+
+          '<div class="fd">'+u.email+' | Tel: '+(u.tel||'—')+' | Uso: '+uso+'/'+u.limit+' | Pass: <strong>'+u.pass+'</strong> | Vence: '+FD(u.vence)+'</div></div>'+
+          '<div class="fa">'+
+          '<button class="bmic" style="background:var(--vc);color:var(--vd)" onclick="adReset('+idx+')">Reset</button>'+
+          '<button class="bmic" style="background:#fffbf0;color:var(--or);border:1px solid var(--or)" onclick="adDesact('+idx+')">Desact.</button>'+
+          '<button class="bmic" style="background:#fde8e6;color:var(--ro)" onclick="adElim('+idx+')">Eliminar</button>'+
+          '</div></div>';
+    }else{
+      hL+='<div class="fur" style="background:#fffcf0;border-color:#e8cf80">'+
+          '<div class="fi"><div class="fn">'+u.nombre+'</div><div class="fd">'+u.email+' | Tel: '+(u.tel||'—')+'</div></div>'+
+          '<div class="fa">'+
+          '<button class="bmic" style="background:linear-gradient(135deg,var(--or),#e0b830);color:#fff" onclick="adPre('+idx+')">Premium ⭐</button>'+
+          '<button class="bmic" style="background:#fde8e6;color:var(--ro)" onclick="adElim('+idx+')">Eliminar</button>'+
+          '</div></div>';
+    }
+  }
+  var eL=$('adm-lite'),eP=$('adm-prem');
+  if(eL)eL.innerHTML=hL||'<p style="font-size:11px;color:#bbb;padding:4px">Sin usuarios Lite.</p>';
+  if(eP)eP.innerHTML=hP||'<p style="font-size:11px;color:#bbb;padding:4px">Sin usuarios Premium.</p>';
+}
+
+function adMsg(t,tp){
+  var el=$('adm-msg'); if(!el)return;
+  var bg=tp==='ok'?'var(--vc)':tp==='err'?'#fde8e6':'#fffcf0';
+  var co=tp==='ok'?'var(--vd)':tp==='err'?'var(--ro)':'#7a5c00';
+  var brd=tp==='ok'?'var(--vv)':tp==='err'?'var(--ro)':'var(--or)';
+  el.innerHTML='<div style="background:'+bg+';border:1px solid '+brd+';color:'+co+';border-radius:8px;padding:10px 14px;font-size:12px;font-weight:600;margin-bottom:10px">'+t+'</div>';
+  setTimeout(function(){if(el&&el.parentNode)el.innerHTML='';},8000);
+}
+
+async function adElim(idx){
+  var em=_AU[idx]; if(!em)return;
+  // confirm() puede ser bloqueado en el sandbox — usamos panel de confirmación inline
+  var conf=document.createElement('div');
+  conf.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  conf.innerHTML='<div style="background:#fff;border-radius:14px;padding:24px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)">'+
+    '<div style="font-size:32px;margin-bottom:8px">⚠️</div>'+
+    '<p style="font-weight:700;font-size:15px;margin-bottom:6px">¿Eliminar cuenta?</p>'+
+    '<p style="font-size:12px;color:#555;margin-bottom:20px">'+em+'<br>Esta acción no se puede deshacer.</p>'+
+    '<div style="display:flex;gap:10px;justify-content:center">'+
+    '<button id="conf-si" style="background:#b52a1a;color:#fff;border:none;padding:10px 22px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px">Eliminar</button>'+
+    '<button id="conf-no" style="background:#f0f0f0;color:#333;border:none;padding:10px 22px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px">Cancelar</button>'+
+    '</div></div>';
+  document.body.appendChild(conf);
+  conf.querySelector('#conf-no').onclick=function(){document.body.removeChild(conf);};
+  conf.querySelector('#conf-si').onclick=async function(){
+    document.body.removeChild(conf);
+    await sd(UK(em)); await sd(CK(em)); adMsg('✅ Eliminado: '+em,'ok'); await adUsers();
+  };
+}
+async function adReset(idx){
+  var em=_AU[idx]; if(!em)return;
+  await sC(em,0); adMsg('✅ Consultas reseteadas: '+em,'ok'); await adUsers();
+}
+async function adDesact(idx){
+  var em=_AU[idx]; if(!em)return;
+  var u=await gU(em); if(!u)return;
+  u.role='lite';u.pass=null;u.limit=0;u.vence=null;
+  await sU(em,u); adMsg('✅ Desactivado: '+em,'ok'); await adUsers();
+}
+function adPre(idx){
+  var em=_AU[idx]; if(!em)return;
+  var el=$('ad-em'); if(el){el.value=em;adBuscar();}
+  adGenCl();
+  if(el)el.scrollIntoView({behavior:'smooth'});
+}
+function adGenCl(){
+  var c='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789',p='';
+  for(var i=0;i<10;i++)p+=c[Math.floor(Math.random()*c.length)];
+  var el=$('ad-cl'); if(el)el.value=p;
+}
+
+var _adT=null;
+function adBuscar(){
+  clearTimeout(_adT);
+  _adT=setTimeout(async function(){
+    var eEl=$('ad-em'),inf=$('ad-inf'); if(!eEl||!inf)return;
+    var em=eEl.value.trim().toLowerCase();
+    if(!em||!VE(em)){inf.style.display='none';return;}
+    var u=await gU(em);
+    inf.style.display='block';
+    inf.innerHTML=u?'<strong>'+u.nombre+'</strong> | Tel: '+(u.tel||'—')+' | Estado: <strong style="color:'+(u.role==='premium'?'var(--or)':u.role==='admin'?'var(--ro)':'#888')+'">'+u.role.toUpperCase()+'</strong>':'<span style="color:var(--na)">No existe cuenta. Se creará nueva al asignar.</span>';
+  },350);
+}
+
+async function adAsignar(){
+  var eEl=$('ad-em'),cEl=$('ad-cl'),lEl=$('ad-lm'),vEl=$('ad-vc');
+  if(!eEl||!cEl||!lEl||!vEl){adMsg('Error: formulario no disponible.','err');return;}
+  var em=eEl.value.trim().toLowerCase(),cl=cEl.value.trim(),lm=parseInt(lEl.value)||30,vc=vEl.value;
+  if(!vc){var d=new Date();d.setFullYear(d.getFullYear()+1);vc=d.toISOString().split('T')[0];}
+  if(!VE(em)){adMsg('Correo inválido.','err');return;}
+  if(!cl||cl.length<4){adMsg('Clave mínimo 4 caracteres.','err');return;}
+  var u=await gU(em);
+  if(u){u.pass=cl;u.role='premium';u.limit=lm;u.vence=vc;await sU(em,u);await sC(em,0);}
+  else{var nu={nombre:em.split('@')[0],tel:'',email:em,pass:cl,role:'premium',limit:lm,vence:vc};await sU(em,nu);await sC(em,0);u=await gU(em)||nu;}
+  var nm=u.nombre||em,tel=(u.tel||'').replace(/[^0-9]/g,'');
+  adMsg('✅ Premium asignado: '+em+' | Clave: '+cl+' | Vence: '+FD(vc),'ok');
+  // Enviar credenciales por correo electrónico
+  envEmail(_EJS.tPremium, {
+    to_email: em,
+    nombre: nm,
+    'correo electrónico': em,
+    clave: cl,
+    consultas: lm,
+    Vence: FD(vc)
+  });
+  var inf=$('ad-inf');if(inf)inf.style.display='none';
+  await adUsers();
+}
+
+async function mkNtfLeer(){
+  if(!_NK.length){adMsg('Sin notificaciones.','info');return;}
+  for(var i=0;i<_NK.length;i++){try{var r=await sg(_NK[i],true);if(r){var n=JSON.parse(r);n.leido=true;await ss(_NK[i],JSON.stringify(n),true);}}catch(x){}}
+  adMsg('✅ Marcadas como leídas.','ok'); await adNtf();
+}
+async function mkNtfBorrar(){
+  if(!_NK.length){adMsg('Sin notificaciones.','info');return;}
+  var conf=document.createElement('div');
+  conf.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  conf.innerHTML='<div style="background:#fff;border-radius:14px;padding:24px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)">'+
+    '<p style="font-weight:700;font-size:15px;margin-bottom:6px">¿Borrar todas las notificaciones?</p>'+
+    '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px">'+
+    '<button id="nf-si" style="background:#b52a1a;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:700;cursor:pointer">Borrar</button>'+
+    '<button id="nf-no" style="background:#f0f0f0;color:#333;border:none;padding:10px 20px;border-radius:8px;font-weight:700;cursor:pointer">Cancelar</button>'+
+    '</div></div>';
+  document.body.appendChild(conf);
+  conf.querySelector('#nf-no').onclick=function(){document.body.removeChild(conf);};
+  conf.querySelector('#nf-si').onclick=async function(){
+    document.body.removeChild(conf);
+    for(var i=0;i<_NK.length;i++){try{await sd(_NK[i],true);}catch(x){}}
+    _NK=[];adMsg('✅ Eliminadas.','ok');await adNtf();
+  };
+}
+</script>
+<!-- Scripts externos cargados al final para no bloquear la página -->
+<script defer src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</body>
+</html>
